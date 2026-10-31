@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Libro de Huéspedes</title>
+<meta name="theme-color" content="#F7F5F1">
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Libro">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one column for the phone — Hoy, reseñas por cobrar (con la ventana de 14 días), números del mes, libro completo de reservas. */
+:root{
+  --bg:#F7F5F1; --surface:#FFFFFF; --ink:#2E3540; --muted:#6E7682; --line:#E8E3DB;
+  --accent:#4E7397; --accent-ink:#FFFFFF; --accent-soft:#E2ECF6;
+  --warn:#A2622B; --warn-soft:#FCE8D7; --bad:#B5525F; --bad-soft:#F9E3E6;
+  --good:#3B7A57; --good-soft:#DDF0E4; --star:#D29B2E; --cell:#E4DFD7;
+  --p1:#4E7397; --p2:#8A74C4; --p3:#C98A57;
+  --tile:#4E7397; --tile-soft:#E2ECF6; --none:#F0EDE8;
+  --lav:#ECE7F7; --lav-ink:#5B4E8C; --butter:#FDF4D6; --butter-ink:#7A5D12;
+  --f-display:"Familjen Grotesk","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  color-scheme:light;
+}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px;display:flex;flex-direction:column;gap:28px}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:1.9rem;font-weight:700;line-height:1.1}
+h2{font-size:1.25rem;font-weight:700}
+.eyebrow{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.mono{font-family:var(--f-mono);font-size:.82rem;letter-spacing:.02em}
+.muted{color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+button,a.btn{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.top .sub{color:var(--muted);font-size:.88rem;margin-top:4px}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:7px 14px;font-size:.88rem;font-weight:700;text-decoration:none;min-height:36px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.on{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.btn.small{padding:4px 11px;min-height:30px;font-size:.82rem}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+
+.banner{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:.92rem}
+.banner.bad{border-color:var(--bad);background:var(--bad-soft)}
+.banner.warn{border-color:var(--warn);background:var(--warn-soft)}
+
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.count{font-family:var(--f-display);font-weight:700;font-size:.9rem;background:var(--warn-soft);color:var(--warn);border-radius:999px;padding:1px 10px;margin-left:8px}
+
+/* Hoy */
+.today{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.prop{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.prop-name{display:flex;align-items:center;gap:8px;font-family:var(--f-display);font-weight:700;font-size:1.05rem}
+.dot{width:10px;height:10px;border-radius:50%;flex:none;background:var(--dot,var(--accent))}
+.prop-state{font-size:.95rem}
+.prop-state b{font-weight:700}
+.tag{display:inline-block;font-size:.75rem;font-weight:700;border-radius:6px;padding:1px 8px;margin-right:6px}
+.tag.in{background:var(--accent-soft);color:var(--accent)}
+.tag.out{background:var(--warn-soft);color:var(--warn)}
+.tag.free{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+
+/* Reseñas */
+.rv-list{display:flex;flex-direction:column;gap:10px}
+.rv{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.rv.urgent{border-color:var(--bad)}
+.rv-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start}
+.rv-title{display:flex;align-items:center;gap:8px;font-weight:700}
+.rv-meta{font-size:.88rem;color:var(--muted)}
+.window{display:flex;flex-direction:column;gap:4px;min-width:180px}
+.cells{display:grid;grid-template-columns:repeat(14,1fr);gap:3px}
+.cells i{height:10px;border-radius:2px;background:var(--cell)}
+.cells i.used{background:var(--muted);opacity:.45}
+.cells i.left{background:var(--warn)}
+.rv.urgent .cells i.left{background:var(--bad)}
+.window-label{font-size:.82rem;display:flex;justify-content:space-between;gap:8px}
+.window-label b{color:var(--warn)}
+.rv.urgent .window-label b{color:var(--bad)}
+.rv-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.rate{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:var(--bg);border-radius:10px;padding:8px 10px}
+.star{border:1px solid var(--line);background:var(--surface);color:var(--star);border-radius:8px;min-width:40px;min-height:36px;font-size:1rem;font-weight:700}
+.star:hover{border-color:var(--star)}
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:14px;padding:16px;color:var(--muted);font-size:.92rem}
+details.expired summary{cursor:pointer;color:var(--muted);font-size:.9rem;margin-top:10px}
+details.expired .rv-list{margin-top:10px}
+
+/* Números */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:2px}
+.tile .v{font-family:var(--f-display);font-weight:700;font-size:1.7rem;line-height:1.15;font-variant-numeric:tabular-nums}
+.tile .h{font-size:.82rem;color:var(--muted)}
+.bar{height:6px;border-radius:3px;background:var(--cell);overflow:hidden;margin-top:6px}
+.bar span{display:block;height:100%;background:var(--accent)}
+
+/* Libro */
+.controls{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;margin-bottom:12px}
+.seg{display:flex;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;color:var(--muted);border-radius:999px;padding:6px 12px;font-weight:700;font-size:.85rem;min-height:32px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.rows{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.row{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 14px;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.cal{text-align:center;border-radius:10px;background:var(--bg);padding:6px 0;line-height:1.05}
+.cal .d{font-family:var(--f-display);font-weight:700;font-size:1.35rem;font-variant-numeric:tabular-nums}
+.cal .m{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.row-main{min-width:0;display:flex;flex-direction:column;gap:2px}
+.row-main .l1{display:flex;align-items:center;gap:8px;font-weight:700;flex-wrap:wrap}
+.row-main .l2{font-size:.86rem;color:var(--muted)}
+.row-side{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.money{font-weight:700;font-variant-numeric:tabular-nums}
+.pill{font-size:.75rem;font-weight:700;border-radius:999px;padding:2px 9px;white-space:nowrap}
+.pill.received{background:var(--good-soft);color:var(--good)}
+.pill.pending{background:var(--warn-soft);color:var(--warn)}
+.pill.expired{background:var(--bad-soft);color:var(--bad)}
+.pill.cancelled{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.pill.stay{background:var(--accent-soft);color:var(--accent)}
+.row .rate{grid-column:1/-1}
+.row.cancel .cal,.row.cancel .row-main{opacity:.6}
+
+.seg .n{font-variant-numeric:tabular-nums;margin-left:5px;opacity:.75}
+.guest{font-family:var(--f-display);font-weight:700;font-size:1.1rem;line-height:1.25}
+.guest.none{color:var(--muted);font-weight:600;font-size:1rem}
+.rv-sub{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:.88rem;color:var(--muted)}
+.link{border:0;background:none;color:var(--accent);font-weight:700;padding:0;font-size:.85rem;text-decoration:underline;text-underline-offset:2px;min-height:24px}
+.name-form{display:flex;gap:6px;flex-wrap:wrap;align-items:center;width:100%}
+.name-form input{font:inherit;border:1px solid var(--line);border-radius:8px;padding:6px 10px;background:var(--surface);color:var(--ink);min-width:0;flex:1 1 180px;min-height:36px}
+.stars{color:var(--star);letter-spacing:.08em;font-size:1.15rem;white-space:nowrap}
+.stars .off{color:var(--cell)}
+.score{display:flex;align-items:baseline;gap:8px}
+.score b{font-family:var(--f-display);font-size:1.15rem;font-variant-numeric:tabular-nums}
+.rv.done{border-color:var(--line)}
+.status{display:flex;flex-wrap:wrap;gap:6px 18px;padding:8px 10px;background:var(--bg);border-radius:10px}
+.st{display:flex;align-items:center;gap:8px;font-size:.88rem;flex-wrap:wrap}
+.st-l{color:var(--muted);font-weight:700}
+.phone{display:inline-flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.foot{font-size:.85rem;color:var(--muted);max-width:68ch}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:.9rem;font-weight:700;max-width:calc(100% - 32px);z-index:20}
+textarea.copybox{width:100%;min-height:110px;font:inherit;font-size:.88rem;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface);color:var(--ink);box-sizing:border-box}
+.skel{color:var(--muted)}
+@media (max-width:520px){
+  h1{font-size:1.6rem}
+  .row{grid-template-columns:52px minmax(0,1fr)}
+  .row-side{grid-column:2;flex-direction:row;align-items:center;justify-content:flex-start;gap:10px;text-align:left}
+}
+
+/* ---- vista Limpieza ---- */
+.viewnav{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px;width:max-content;max-width:100%}
+.viewnav button{border:0;background:transparent;color:var(--muted);border-radius:999px;padding:8px 16px;font:inherit;font-weight:700;font-size:.92rem;min-height:38px;cursor:pointer}
+.viewnav button[aria-pressed="true"]{background:var(--tile);color:#fff}
+.views{display:contents}
+.hero{background:linear-gradient(135deg,#E8F0F8 0%,#F1ECF8 100%);border:1px solid var(--line);border-radius:18px;padding:22px 20px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px 26px;align-items:center;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-30px;top:-30px;width:140px;height:140px;opacity:.5;background:conic-gradient(from 45deg, var(--tile-soft) 0 25%, transparent 0 50%, var(--tile-soft) 0 75%, transparent 0) 0 0/35px 35px;border-radius:12px;transform:rotate(8deg);pointer-events:none}
+.big{font-family:var(--f-display);font-weight:700;font-size:clamp(4rem,18vw,6.2rem);line-height:.9;letter-spacing:-.03em;color:var(--tile);font-variant-numeric:tabular-nums}
+.big small{font-size:.32em;color:var(--muted);letter-spacing:0;margin-left:4px}
+.hero .stars{font-size:1.25rem}
+.hero-side{display:flex;flex-direction:column;gap:6px;min-width:0;position:relative;z-index:1}
+.hero-side b{font-family:var(--f-display);font-size:1.05rem}
+.split{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.chip{font-size:.8rem;font-weight:700;border-radius:999px;padding:2px 10px;white-space:nowrap}
+.chip.good{background:var(--good-soft);color:var(--good)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.none{background:var(--none);color:var(--muted)}
+@media (max-width:520px){.hero{grid-template-columns:1fr;gap:10px}}
+.praise{display:flex;flex-direction:column;gap:10px}
+.prow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center}
+.prow .t{font-weight:700}
+.prow .c{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.9rem}
+.cbar{grid-column:1/-1;height:8px;border-radius:4px;background:var(--none);overflow:hidden}
+.cbar span{display:block;height:100%;background:var(--tile)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 1px 2px rgba(46,53,64,.04),0 4px 14px rgba(46,53,64,.04)}
+.card.low{border-color:var(--warn)}
+.card-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
+.who{font-family:var(--f-display);font-weight:700;font-size:1.05rem}
+.when{font-size:.88rem;color:var(--muted)}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.ctag{font-size:.82rem;background:var(--tile-soft);color:var(--tile);border-radius:8px;padding:3px 9px;font-weight:700}
+.quote{margin:0;padding:8px 12px;border-left:3px solid var(--tile);background:var(--bg);border-radius:0 8px 8px 0;font-size:.92rem}
+.quote .src{display:block;font-size:.75rem;color:var(--muted);margin-top:2px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.list{display:flex;flex-direction:column;gap:10px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.shop-form{display:flex;gap:8px;flex-wrap:wrap}
+.shop-form input{font:inherit;border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--surface);color:var(--ink);min-height:42px;min-width:0}
+#shop-item{flex:1 1 220px}
+#shop-qty{flex:0 1 110px}
+.shop-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.shop-list li{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+.shop-list li:first-child{border-top:0}
+.si{min-width:0;display:flex;flex-direction:column;gap:1px}
+.si b{font-weight:700}
+.si span{font-size:.82rem;color:var(--muted)}
+.si.done b{text-decoration:line-through;color:var(--muted)}
+.sa{display:flex;gap:6px}
+#view-clean .seg button[aria-pressed="true"]{background:var(--tile);color:var(--surface)}
+/* ---- Semana / Acciones (igual que la app del equipo) ---- */
+.csub{display:flex;gap:2px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px;width:max-content;max-width:100%}
+.csub button{border:0;background:transparent;color:var(--muted);border-radius:999px;padding:7px 14px;font:inherit;font-weight:700;font-size:.88rem;min-height:36px;cursor:pointer;white-space:nowrap}
+.csub button[aria-pressed="true"]{background:var(--lav);color:var(--lav-ink)}
+.wres{border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px;border:1px solid var(--line);background:var(--surface);box-shadow:0 1px 2px rgba(46,53,64,.04),0 4px 14px rgba(46,53,64,.04)}
+.wres.now{background:linear-gradient(135deg,#EEF5FB 0%,#FFFFFF 70%)}.wres.next{background:linear-gradient(135deg,#F3EFFA 0%,#FFFFFF 70%)}
+.wres-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.wres-name{font-family:var(--f-display);font-weight:700;font-size:1.35rem;line-height:1.1}
+.wpill{display:inline-flex;font-size:.8rem;font-weight:700;border-radius:999px;padding:4px 11px;white-space:nowrap}
+.wpill.sky{background:var(--tile-soft);color:var(--tile)}.wpill.lav{background:var(--lav);color:var(--lav-ink)}.wpill.mint{background:var(--good-soft);color:var(--good)}.wpill.butter{background:var(--butter);color:var(--butter-ink)}.wpill.gray{background:var(--none);color:var(--muted)}
+.wio{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.wio div{background:var(--bg);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.wio small{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.wio b{font-family:var(--f-display);font-size:1.05rem}.wio span{font-size:.9rem;color:var(--muted)}.wio .tbc{color:var(--warn)}
+.wnotes{background:#FDF4D6;color:#6B5212;border-radius:12px;padding:8px 12px;font-size:.9rem;display:flex;flex-direction:column;gap:3px}
+.wnotes small{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8A6D1C}
+.wnotes .tbc{color:#A2622B;font-weight:700}
+.chatsum{font-size:.86rem;background:var(--accent-soft);color:var(--ink);border-radius:10px;padding:6px 10px;margin-top:4px}
+.chatpend{font-size:.86rem;background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:6px 10px;margin-top:4px}
+.wclean{font-size:.9rem;background:var(--good-soft);color:var(--good);border-radius:12px;padding:8px 12px;font-weight:700}
+.wcal{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:0 1px 2px rgba(46,53,64,.04),0 4px 14px rgba(46,53,64,.04)}
+.wcal>summary{list-style:none;cursor:pointer;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:56px}
+.wcal>summary::-webkit-details-marker{display:none}
+.wcal>summary b{font-family:var(--f-display);font-size:1.1rem;display:block}.wcal>summary span{font-size:.88rem;color:var(--muted)}
+.chev{width:34px;height:34px;border-radius:50%;background:var(--tile-soft);color:var(--tile);display:grid;place-items:center;flex:none;transition:transform .2s}
+.wcal[open] .chev{transform:rotate(180deg)}
+.wcal-body{padding:0 14px 16px;display:flex;flex-direction:column;gap:16px}
+.wlegend{display:flex;gap:12px;flex-wrap:wrap;font-size:.78rem;color:var(--muted)}.wlegend span{display:inline-flex;align-items:center;gap:5px}
+.wmonth h4{font-family:var(--f-display);margin:0 0 8px;font-size:1rem;text-transform:capitalize}
+.wgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.wdh{font-size:.68rem;color:var(--muted);text-align:center;font-weight:700;padding-bottom:2px}
+.wcd{height:40px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;font:inherit;font-size:.88rem;border:0;background:transparent;color:var(--ink);padding:0;line-height:1.05}
+.wcd small{font-size:.55rem;font-weight:700;color:var(--muted)}
+.wcd.occ{background:#E2ECF6}.wcd.in{background:#ECE7F7}.wcd.out{background:#DDF0E4}.wcd.turn{background:linear-gradient(135deg,#DDF0E4 50%,#ECE7F7 50%)}
+.wcd.past{opacity:.38}.wcd.today{box-shadow:inset 0 0 0 2px var(--tile);font-weight:700}
+.wcd[data-wres]{cursor:pointer}.wcd.sel{box-shadow:inset 0 0 0 2px #8C7CC4;font-weight:700}
+.wchips{display:flex;gap:6px;flex-wrap:wrap}
+.wchip{font:inherit;font-size:.85rem;font-weight:700;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:6px 12px;min-height:36px;cursor:pointer}
+.wchip[aria-pressed="true"]{background:var(--lav);border-color:#D6CCF0;color:var(--lav-ink)}
+.wtwo{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:640px){.wtwo{grid-template-columns:1fr}}
+.card h3{font-family:var(--f-display);font-size:1.05rem;margin:0;display:flex;align-items:center;gap:8px}
+#todo-form input{font:inherit;border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--surface);color:var(--ink);min-height:42px;min-width:0;flex:1 1 240px}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.gate{position:fixed;inset:0;z-index:60;background:var(--bg);overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px}
+.gate-in{max-width:420px;width:100%;display:flex;flex-direction:column;gap:16px}
+.gate-head{display:flex;gap:14px;align-items:center}
+.gate-head img{width:72px;height:72px;border-radius:18px;flex:none}
+.gate input{box-sizing:border-box;font:inherit;font-family:var(--f-mono);font-size:1.15rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--surface);color:var(--ink);min-height:52px;width:100%}
+.big-btn{font:inherit;font-family:var(--f-display);font-weight:700;font-size:1.1rem;border:0;border-radius:14px;padding:14px 20px;min-height:54px;background:var(--accent);color:#fff;cursor:pointer;width:100%}
+.big-btn[disabled]{opacity:.55}
+.link-btn{font:inherit;background:none;border:0;color:var(--muted);text-decoration:underline;padding:10px;cursor:pointer;min-height:44px}
+.steps{margin:0;padding:0;list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:12px}
+.steps li{counter-increment:s;display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;align-items:start}
+.steps li::before{content:counter(s);width:30px;height:30px;border-radius:50%;background:var(--lav);color:var(--lav-ink);font-family:var(--f-display);font-weight:700;display:grid;place-items:center}
+.ico{display:inline-block;vertical-align:-4px;width:20px;height:20px}
+.mini{display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--lav);color:var(--lav-ink);border-radius:14px;padding:10px 14px;font-weight:700}
+.gate-err{color:var(--bad);font-weight:700;font-size:.9rem}
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate" hidden>
+  <form class="gate-in" id="gate-form" autocomplete="off">
+    <div class="gate-head"><img src="icon-192.png" alt=""><div><div class="eyebrow">Acceso privado</div><h1 style="font-size:1.5rem">Libro de Huéspedes</h1></div></div>
+    <p style="margin:0">Esta app tiene datos de tus huéspedes y de tus ingresos. Ingresá tu clave de acceso (se pide una sola vez en cada celular).</p>
+    <label for="gate-key" class="sr">Clave de acceso</label>
+    <input id="gate-key" placeholder="XXXX-XXXX-XXXX-XXXX" autocapitalize="characters" autocorrect="off" spellcheck="false" required>
+    <div class="gate-err" id="gate-err" hidden></div>
+    <button class="big-btn" id="gate-go" type="submit">Entrar</button>
+  </form>
+</div>
+<div class="gate" id="inst" hidden>
+  <div class="gate-in">
+    <div class="gate-head"><img src="icon-192.png" alt=""><div><div class="eyebrow">Paso único</div><h1 style="font-size:1.5rem">Instalá el Libro</h1></div></div>
+    <p style="margin:0">Queda como un ícono en la pantalla del celular y se abre como una app, al lado de la de Limpieza.</p>
+    <div id="i-android" hidden>
+      <button class="big-btn" id="i-go" type="button">Instalar la app</button>
+      <p class="muted" id="i-wait" style="font-size:.9rem;margin:10px 0 0">Preparando…</p>
+      <div id="i-manual" hidden style="margin-top:14px">
+        <p style="margin:0 0 10px"><b>Si el botón no aparece</b>, hacelo a mano (es una sola vez):</p>
+        <ol class="steps">
+          <li><span>Si abriste el link desde WhatsApp, tocá <b>⋮</b> y elegí <b>Abrir en Chrome</b>.</span></li>
+          <li><span>En Chrome tocá <b>⋮</b> arriba a la derecha.</span></li>
+          <li><span>Elegí <b>Instalar app</b> o <b>Agregar a la pantalla principal</b>, y confirmá.</span></li>
+        </ol>
+      </div>
+    </div>
+    <div id="i-ios" hidden>
+      <ol class="steps">
+        <li><span>Tocá <b>Compartir</b> <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg> en la barra de Safari.</span></li>
+        <li><span>Bajá y elegí <b>Agregar a inicio</b> <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg>.</span></li>
+        <li><span>Tocá <b>Agregar</b>. Listo: el ícono aparece en la pantalla.</span></li>
+      </ol>
+      <p class="muted" style="font-size:.9rem;margin:12px 0 0">¿No aparece <b>Agregar a inicio</b>? Abrí el link en Safari (no dentro de WhatsApp) y repetí los pasos.</p>
+    </div>
+    <div id="i-desk" hidden><p class="muted" style="margin:0">Abrí este link desde el celular para instalarla. En la compu también podés usarla desde el navegador.</p></div>
+    <div id="i-done" hidden class="card" style="border-color:var(--good)"><b style="color:var(--good)">¡Listo! Ya está instalada.</b><span class="muted">Buscá el ícono <b>Libro</b> en la pantalla de inicio.</span></div>
+    <button class="link-btn" id="i-skip" type="button">Seguir en el navegador</button>
+  </div>
+</div>
+<script>
+/* ---- Capa de datos: reemplaza a Claude (PriceLabs, base del Libro y planilla) por el script privado de Google ---- */
+(function(){
+  "use strict";
+  var EXEC = "https://script.google.com/macros/s/AKfycbyzWNZePejb5ba_qbvsXl-KcOy0Ppv9LcHOfTq9l08LQxnvieeL_PTmils_XdR2ld65/exec";
+  var K = null, D = null, L = [], pulling = null, lastErr = null;
+  try { K = localStorage.getItem("libro_clave"); } catch (e) {}
+  try { D = JSON.parse(localStorage.getItem("libro_datos") || "null"); } catch (e) {}
+  window.__libroKey = function(){ return K; };
+  function api(body, key){
+    return fetch(EXEC, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(Object.assign({ k: key || K }, body)) })
+      .then(function(r){ return r.json(); })
+      .then(function(j){ if (j && j.error === "denied") throw { code: "denied" }; if (j && j.error) throw { code: "tool_error", message: j.error }; return j; });
+  }
+  window.__libroApi = api;
+  function emit(){ L.slice().forEach(function(l){ try { l.ok(); } catch (e) {} }); }
+  function emitErr(err){ L.slice().forEach(function(l){ try { if (l.err) l.err(err); } catch (e) {} }); }
+  function pull(){
+    if (!K) return Promise.reject({ code: "denied" });
+    if (pulling) return pulling;
+    pulling = api({ op: "o_read" }).then(function(j){
+      D = j; D.at = Date.now(); lastErr = null;
+      try { localStorage.setItem("libro_datos", JSON.stringify(j)); } catch (e) {}
+      emit(); return j;
+    }, function(err){
+      lastErr = err;
+      if (err && err.code === "denied") { try { localStorage.removeItem("libro_clave"); localStorage.removeItem("libro_datos"); } catch (e) {} location.reload(); }
+      else emitErr({ code: "upstream_error", message: "Sin conexión" });
+      throw err;
+    });
+    pulling.then(function(){ pulling = null; }, function(){ pulling = null; });
+    return pulling;
+  }
+  function listen(ok, err){ var l = { ok: ok, err: err }; L.push(l); return function(){ L = L.filter(function(x){ return x !== l; }); }; }
+  var SHEET_IDS = { 848263421: "Compras", 517659113: "Tareas" };
+  function stamp(){ return D && D.at ? D.at : Date.now(); }
+  function result(server, tool, args){
+    if (server === "PriceLabs MCP") {
+      var b = (D && D.bookings) || [];
+      return { payload: { data: { data: { reservations: b, pagination: { has_more: false, total: b.length } } } }, cache: { storedAt: D && D.bookingsAt ? Date.parse(D.bookingsAt) : stamp() } };
+    }
+    if (server === "Google Sheets" && tool === "get_values") {
+      var name = String(args.range || "").split("!")[0];
+      return { payload: { range: args.range, values: (D && D.sheets && D.sheets[name]) || [] }, cache: { storedAt: stamp() } };
+    }
+    return { payload: {} };
+  }
+  var mcp = {
+    watchTool: function(server, tool, args, cb){
+      var f = function(){ if (D) cb({ type: "data", result: result(server, tool, args) }); };
+      var off = listen(f, function(err){ if (!D) cb({ type: "error", error: err }); });
+      f(); return off;
+    },
+    callTool: function(server, tool, args, opts){
+      if (server === "Google Sheets" && tool === "update_values") return api({ op: "o_sheet_update", range: args.range, values: args.values }).then(function(){ return { payload: { ok: true } }; });
+      if (server === "Google Sheets" && tool === "update_spreadsheet") {
+        var rq = (args.requests || [])[0] || {}, dd = rq.deleteDimension && rq.deleteDimension.range;
+        if (!dd || !SHEET_IDS[dd.sheetId]) return Promise.reject({ code: "tool_error" });
+        return api({ op: "o_sheet_delete_row", sheet: SHEET_IDS[dd.sheetId], row: dd.startIndex + 1 }).then(function(){ return { payload: { ok: true } }; });
+      }
+      var fresh = !D || (opts && (opts.cache === false || (opts.cache && opts.cache.refresh)));
+      return (fresh ? pull() : Promise.resolve(D)).then(function(){ return result(server, tool, args); });
+    },
+    invalidate: function(){ return pull().catch(function(){}); }
+  };
+  function snapOf(col){
+    var m = (D && D.db && D.db[col]) || {};
+    var docs = Object.keys(m).map(function(id){ var v = m[id]; return { id: id, exists: true, data: function(){ return JSON.parse(JSON.stringify(v)); } }; });
+    return { docs: docs, empty: !docs.length, size: docs.length, forEach: function(f){ docs.forEach(f); } };
+  }
+  function localSet(col, id, data){
+    D = D || { db: {} }; D.db = D.db || {}; D.db[col] = D.db[col] || {};
+    if (data === null) delete D.db[col][id]; else D.db[col][id] = data;
+    try { localStorage.setItem("libro_datos", JSON.stringify(D)); } catch (e) {}
+    emit();
+  }
+  function docRef(col, id){
+    function cur(){ return D && D.db && D.db[col] && D.db[col][id]; }
+    return {
+      id: id,
+      onSnapshot: function(cb){ var f = function(){ var v = cur(); cb({ id: id, exists: !!v, data: function(){ return v; } }); }; var off = listen(f); if (D) f(); return off; },
+      get: function(){ return (D ? Promise.resolve() : pull()).then(function(){ var v = cur(); return { id: id, exists: !!v, data: function(){ return v; } }; }); },
+      set: function(data){ var before = cur(); localSet(col, id, data); return api({ op: "o_db_set", col: col, id: id, data: data }).catch(function(e){ localSet(col, id, before || null); throw e; }); },
+      update: function(patch){ var before = cur(); localSet(col, id, Object.assign({}, before || {}, patch)); return api({ op: "o_db_set", col: col, id: id, data: patch, merge: true }).catch(function(e){ localSet(col, id, before || null); throw e; }); },
+      delete: function(){ var before = cur(); localSet(col, id, null); return api({ op: "o_db_delete", col: col, id: id }).catch(function(e){ localSet(col, id, before || null); throw e; }); }
+    };
+  }
+  var db = {
+    collection: function(col){
+      var q = {
+        onSnapshot: function(cb, err){ var f = function(){ cb(snapOf(col)); }; var off = listen(f, function(e){ if (!D && err) err(e); }); if (D) f(); return off; },
+        get: function(){ return (D ? Promise.resolve() : pull()).then(function(){ return snapOf(col); }); },
+        doc: function(id){ return docRef(col, id); },
+        add: function(data){ var id = Math.random().toString(36).slice(2, 10); return docRef(col, id).set(data).then(function(){ return { id: id }; }); }
+      };
+      q.limit = function(){ return q; };
+      return q;
+    },
+    doc: function(path){ var p = String(path).split("/"); return docRef(p[0], p[1]); }
+  };
+  var user = { isOwner: function(){ return Promise.resolve(true); }, canEdit: function(){ return Promise.resolve(true); }, id: function(){ return Promise.resolve("dueno"); },
+    can: function(){ return Promise.resolve(true); }, profiles: function(){ return Promise.resolve({}); } };
+  if (K) {
+    window.claude = { use: function(name){ return Promise.resolve(name === "mcp" ? mcp : name === "db" ? db : name === "user" ? user : null); } };
+    pull().catch(function(){});
+    setInterval(function(){ if (!document.hidden) pull().catch(function(){}); }, 60000);
+    document.addEventListener("visibilitychange", function(){ if (!document.hidden && (!D || Date.now() - stamp() > 20000)) pull().catch(function(){}); });
+  }
+})();
+</script>
+
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow" id="eyebrow">Airbnb · Encantador apart de época Retiro</div>
+      <h1 id="apptitle">Libro de Huéspedes</h1>
+      <div class="sub" id="sub">Cargando reservas…</div>
+      <div class="sub" id="sync"></div>
+    </div>
+    <button class="btn" id="refresh" type="button" data-action="refresh">Actualizar</button>
+  </header>
+  <nav class="viewnav" id="viewnav" aria-label="Secciones" hidden>
+    <button type="button" data-view="main" aria-pressed="true">Reservas y reseñas</button>
+    <button type="button" data-view="clean" aria-pressed="false">Limpieza</button>
+  </nav>
+  <div id="view-main" class="views" hidden>
+
+  <div id="banners"></div>
+
+  <section aria-labelledby="h-today">
+    <div class="sec-head"><h2 id="h-today">Hoy</h2><span class="muted" id="today-date"></span></div>
+    <div class="today" id="today"><div class="empty skel">Buscando quién está en cada departamento…</div></div>
+  </section>
+
+  <section aria-labelledby="h-rv">
+    <div class="sec-head">
+      <h2 id="h-rv">Reseñas pendientes<span class="count" id="rv-count" hidden></span></h2>
+      <span class="muted" style="font-size:.85rem">Airbnb da 14 días desde el checkout</span>
+    </div>
+    <div class="controls">
+      <div class="seg" id="rv-props" role="group" aria-label="Departamento"></div>
+      <div class="seg" id="rv-views" role="group" aria-label="Qué reseñas ver"></div>
+    </div>
+    <div id="reviews"><div class="empty skel">Revisando checkouts recientes…</div></div>
+  </section>
+
+  <section aria-labelledby="h-month">
+    <div class="sec-head"><h2 id="h-month">Este mes</h2><span class="muted" id="month-name"></span></div>
+    <div class="tiles" id="tiles"></div>
+  </section>
+
+  <section aria-labelledby="h-book">
+    <div class="sec-head"><h2 id="h-book">Reservas</h2></div>
+    <div class="controls">
+      <div class="seg" id="tabs" role="group" aria-label="Estado">
+        <button type="button" data-tab="upcoming" aria-pressed="true">Próximas</button>
+        <button type="button" data-tab="stay" aria-pressed="false">En curso</button>
+        <button type="button" data-tab="past" aria-pressed="false">Terminadas</button>
+        <button type="button" data-tab="cancelled" aria-pressed="false">Canceladas</button>
+      </div>
+      <div class="seg" id="props" role="group" aria-label="Departamento"></div>
+    </div>
+    <div id="rows"></div>
+  </section>
+
+  <p class="foot">Las reservas (PriceLabs) y las reseñas, nombres, teléfonos y chats (Airbnb) los actualiza Claude todas las mañanas a las 9. Las compras y tareas se ven al instante. Los montos son el ingreso por alojamiento que informa PriceLabs, en USD. El equipo de limpieza usa su propia app instalable (esmeralda-vip.github.io/limpieza-retiro), que lee la misma planilla.</p>
+  </div>
+  <div id="view-clean" class="views" hidden>
+  <section aria-label="Limpieza">
+    <h2 style="font-size:1.45rem">Limpieza</h2>
+    <div class="muted" style="font-size:.9rem;margin-top:4px">Lo mismo que ve el equipo en su app, más los botones para marcar compras y tareas.</div>
+    <nav class="csub" id="csub" aria-label="Secciones de limpieza" style="margin-top:12px">
+      <button type="button" data-cv="semana" aria-pressed="true">Semana</button>
+      <button type="button" data-cv="acciones" aria-pressed="false">Acciones<span class="count" id="acc-count" hidden></span></button>
+      <button type="button" data-cv="evaluaciones" aria-pressed="false">Evaluaciones</button>
+    </nav>
+  </section>
+
+  <section data-cv-sec="semana">
+    <div class="sec-head"><h2 id="w-now-title">Reserva actual</h2><span class="muted" id="w-today"></span></div>
+    <div class="list" id="w-now"><div class="empty skel">Cargando reservas…</div></div>
+  </section>
+  <section data-cv-sec="semana">
+    <details class="wcal" id="wcal">
+      <summary><div><b>Calendario de reservas</b><span id="wcal-sum">Cargando…</span></div><i class="chev" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></i></summary>
+      <div class="wcal-body">
+        <div class="wlegend"><span><i class="dot" style="--dot:#C9B9EC"></i>Llegada</span><span><i class="dot" style="--dot:#A9D8BB"></i>Salida · limpieza</span><span><i class="dot" style="--dot:#B9D0E8"></i>Ocupado</span></div>
+        <div class="wchips" id="wchips"></div>
+        <div id="wmonths"></div>
+        <div id="wdet"></div>
+      </div>
+    </details>
+  </section>
+  <section data-cv-sec="semana">
+    <h2 style="margin-bottom:12px">Lo que quedó pendiente</h2>
+    <div class="wtwo">
+      <div class="card"><h3><i class="dot" style="--dot:#F2C59E"></i>Para comprar</h3><ul class="shop-list" id="w-buy"><li class="muted">Cargando…</li></ul></div>
+      <div class="card"><h3><i class="dot" style="--dot:#C9B9EC"></i>Para hacer</h3><ul class="shop-list" id="w-todo"><li class="muted">Cargando…</li></ul></div>
+    </div>
+    <button class="btn" type="button" data-cv="acciones" style="margin-top:12px">Marcar o cargar en Acciones →</button>
+  </section>
+
+  <section data-cv-sec="evaluaciones">
+    <div class="muted" id="c-sub" style="font-size:.9rem">Cargando evaluaciones…</div>
+  </section>
+  <section class="hero" aria-label="Nota de limpieza" data-cv-sec="evaluaciones">
+    <div class="big" id="big">—</div>
+    <div class="hero-side">
+      <span class="stars" id="bigstars" aria-hidden="true"></span>
+      <b id="bigtext">Nota promedio de limpieza</b>
+      <span class="muted" id="bigsub" style="font-size:.9rem">Calificación que dan los huéspedes en Airbnb a la limpieza, de 1 a 5.</span>
+      <div class="split" id="split"></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-shop" class="shop" data-cv-sec="acciones">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+      <h2 id="h-shop">Lista de compras<span class="count" id="shop-count" hidden></span></h2>
+      <button class="btn small" type="button" id="shop-refresh" data-refresh-compras hidden>Actualizar lista</button>
+    </div>
+    <div class="card">
+      <p style="margin:0;font-size:.9rem">El equipo carga las compras en su <a class="link" href="https://esmeralda-vip.github.io/limpieza-retiro/" target="_blank" rel="noopener">app de limpieza ↗</a> y acá las ves en vivo (se revisa sola cada minuto). Vos también podés agregar; cuando compres algo, tocá Comprado o Borrar y el equipo lo ve al instante.</p>
+      <form id="shop-form" class="shop-form" autocomplete="off">
+        <label for="shop-item" class="sr">Qué hace falta</label>
+        <input id="shop-item" type="text" maxlength="80" placeholder="Qué hace falta (ej. lavandina, bolsas de residuo)" required>
+        <label for="shop-qty" class="sr">Cantidad</label>
+        <input id="shop-qty" type="text" maxlength="20" placeholder="Cantidad">
+        <button class="btn primary" type="submit" id="shop-add">Agregar</button>
+      </form>
+      <div class="muted" id="shop-note" style="font-size:.85rem" hidden></div>
+      <div class="muted" id="shop-src" style="font-size:.8rem"></div>
+      <ul class="shop-list" id="shop-list"><li class="muted">Cargando la lista…</li></ul>
+      <details id="shop-done" hidden><summary class="muted">Comprado en los últimos 30 días</summary><ul class="shop-list" id="shop-done-list"></ul></details>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-todo" data-cv-sec="acciones">
+    <h2 id="h-todo" style="margin-bottom:12px">Para hacer<span class="count" id="todo-count" hidden></span></h2>
+    <div class="card">
+      <form id="todo-form" class="shop-form" autocomplete="off">
+        <label for="todo-item" class="sr">Qué hay que hacer</label>
+        <input id="todo-item" type="text" maxlength="120" placeholder="Qué hay que hacer (ej. cambiar el foco del baño)" required>
+        <button class="btn primary" type="submit" id="todo-add">Agregar</button>
+      </form>
+      <div class="muted" id="todo-src" style="font-size:.8rem"></div>
+      <ul class="shop-list" id="todo-list"><li class="muted">Cargando…</li></ul>
+      <details id="todo-done" hidden><summary class="muted">Hechas en los últimos 7 días</summary><ul class="shop-list" id="todo-done-list"></ul></details>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-praise" data-cv-sec="evaluaciones">
+    <h2 id="h-praise" style="margin-bottom:12px">Lo que más destacan</h2>
+    <div class="card"><div class="praise" id="praise"><span class="muted">Sin datos todavía.</span></div>
+      <span class="muted" style="font-size:.82rem">Son las frases que Airbnb les ofrece marcar al calificar la limpieza.</span></div>
+  </section>
+
+  <section aria-labelledby="h-improve" data-cv-sec="evaluaciones">
+    <h2 id="h-improve" style="margin-bottom:12px">Para mejorar</h2>
+    <div class="list" id="improve"><div class="empty">Sin datos todavía.</div></div>
+  </section>
+
+  <section aria-labelledby="h-stays" data-cv-sec="evaluaciones">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+      <h2 id="h-stays">Cada estadía</h2>
+      <div class="seg" id="filter" role="group" aria-label="Filtrar estadías">
+        <button type="button" data-f="all" aria-pressed="true">Todas</button>
+        <button type="button" data-f="comments" aria-pressed="false">Con comentarios</button>
+        <button type="button" data-f="low" aria-pressed="false">Menos de 5</button>
+      </div>
+    </div>
+    <div class="list" id="stays"><div class="empty">Las estadías aparecen acá cuando se cargan las evaluaciones.</div></div>
+  </section>
+
+  <p class="foot">Semana muestra la reserva actual y el calendario hasta la última reserva aceptada (nombre de pila, huéspedes y horarios), que se actualizan todos los días desde Airbnb. Acciones es la lista de compras y de tareas que comparten con el equipo: lo que marca uno lo ve el otro al instante. Evaluaciones muestra solo lo referido a la limpieza.</p>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(function(){
+  "use strict";
+  var SERVER = "PriceLabs MCP", TOOL = "get_bookings_report";
+  var DAY = 864e5, WINDOW = 14;
+  var S = {
+    res: [], listings: [], loaded: false, updatedAt: null,
+    mcp: null, mcpState: "loading", mcpErr: null,
+    db: null, dbState: "loading", reviews: {}, saving: {},
+    tab: "upcoming", prop: "all", rateOpen: null, rateFrom: null,
+    rvProp: null, rvView: "pending", nameEdit: null, nameFrom: null, nameDraft: "", copyFallback: null
+  };
+
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
+  function todayDay(){ var n = new Date(); return Math.round(Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()) / DAY); }
+  function iso(day){ return new Date(day * DAY).toISOString().slice(0, 10); }
+  function dt(day){ return new Date(day * DAY); }
+  function fmt(day, opts){ return dt(day).toLocaleDateString("es-AR", Object.assign({ timeZone: "UTC" }, opts || { day: "numeric", month: "short" })).replace(".", ""); }
+  function money(v){ return "US$ " + Math.round(v).toLocaleString("es-AR"); }
+  function plural(n, a, b){ return n + " " + (n === 1 ? a : b); }
+  var TODAY = todayDay();
+
+  /* ---------- datos ---------- */
+  function cleanName(n){ n = String(n || "Departamento"); return n.split("--")[0].split(" · ")[0].trim(); }
+  function parse(payload){
+    var p = payload || {};
+    var d = (p.data && p.data.data) || p.data || p;
+    var list = (d && d.reservations) || [];
+    var pag = (d && d.pagination) || {};
+    return { list: list, hasMore: !!pag.has_more, total: pag.total };
+  }
+  function normalize(raw){
+    var out = [], seen = {};
+    raw.forEach(function(r){
+      if (!r || !r.reservation_id || seen[r.reservation_id]) return;
+      if (String(r.listing_id) !== ONLY_LISTING) return;
+      seen[r.reservation_id] = 1;
+      var inD = Math.round(Number(r.start_date) / DAY), outD = Math.round(Number(r.end_date) / DAY);
+      if (!isFinite(inD) || !isFinite(outD)) return;
+      out.push({
+        id: String(r.reservation_id), listing: String(r.listing_id), name: cleanName(r.listing_name),
+        city: r.city || "", inD: inD, outD: outD, nights: Number(r.no_of_days) || (outD - inD),
+        revenue: Number(r.rental_revenue) || 0, status: r.status === "cancelled" ? "cancelled" : "booked",
+        bookedD: r.booked_time ? Math.floor(Number(r.booked_time) / DAY) : null, lead: r.lead_time
+      });
+    });
+    out.sort(function(a, b){ return a.inD - b.inD; });
+    return out;
+  }
+  function buildListings(){
+    var m = {}, order = [];
+    S.res.forEach(function(r){ if (!m[r.listing]) { m[r.listing] = { id: r.listing, name: r.name, city: r.city }; order.push(r.listing); } });
+    var cityCount = {};
+    order.forEach(function(id){ var c = m[id].city || m[id].name; cityCount[c] = (cityCount[c] || 0) + 1; });
+    S.listings = order.map(function(id, i){
+      var l = m[id], c = l.city || l.name;
+      l.label = cityCount[c] > 1 ? l.name : c;
+      l.color = "var(--p" + ((i % 3) + 1) + ")";
+      return l;
+    });
+  }
+  function L(id){ for (var i = 0; i < S.listings.length; i++) if (S.listings[i].id === id) return S.listings[i]; return { label: "Departamento", name: "Departamento", color: "var(--accent)", city: "" }; }
+
+  function reviewState(r){
+    if (r.status === "cancelled") return { k: "cancelled" };
+    if (r.outD > TODAY) return { k: r.inD <= TODAY ? "stay" : "upcoming" };
+    var rv = S.reviews[r.id] || {};
+    var since = TODAY - r.outD;
+    if (rv.guestReviewed) return { k: "received", rating: rv.rating, since: since };
+    if (since < WINDOW) return { k: "pending", since: since, left: WINDOW - 1 - since };
+    return { k: "expired", since: since };
+  }
+
+  /* ---------- PriceLabs ---------- */
+  var ONLY_LISTING = "1434292265638435339"; /* Encantador apart de época Retiro */
+  var INPUT = {
+    question: "Libro de Huéspedes: reservas de Airbnb para el panel de reseñas",
+    date_filters: { min_check_in_date: iso(TODAY - 150), max_check_in_date: iso(TODAY + 270) },
+    filters: { booking_status: ["booked", "cancelled"], listings: [{ listing_id: ONLY_LISTING, pms_name: "airbnb" }] },
+    limit: 500, offset: 0
+  };
+  var DENIALS = { needs_reauth: 1, server_not_connected: 1, selection_required: 1, not_in_manifest: 1, blocked_by_policy: 1, approval_required: 1, server_not_found: 1, consent_required: 1 };
+
+  function onData(result){
+    var first = parse(result && result.payload);
+    var stamp = (result && result.cache && result.cache.storedAt) || Date.now();
+    var all = first.list.slice();
+    function finish(){
+      S.res = normalize(all); buildListings(); S.loaded = true;
+      S.mcpState = "ok"; S.mcpErr = null; S.updatedAt = stamp; render();
+    }
+    if (!first.hasMore || !S.mcp) return finish();
+    var offset = all.length;
+    (function next(){
+      var inp = JSON.parse(JSON.stringify(INPUT)); inp.offset = offset;
+      S.mcp.callTool(SERVER, TOOL, inp, { cache: { staleTime: 600000, gcTime: 86400000 } }).then(function(res){
+        var pg = parse(res && res.payload); all = all.concat(pg.list); offset += pg.list.length;
+        if (pg.hasMore && pg.list.length && offset < 5000) next(); else finish();
+      }, function(){ finish(); });
+    })();
+  }
+  function onError(err){
+    var code = (err && err.code) || "upstream_error";
+    S.mcpErr = { code: code, message: (err && err.message) || "" };
+    if (DENIALS[code] || code === "not_granted" || code === "capability_disabled" || code === "capability_removed") {
+      S.res = []; S.listings = []; S.loaded = false; S.mcpState = "denied";
+    } else {
+      S.mcpState = S.loaded ? "stale" : "error";
+    }
+    render();
+  }
+  function startMcp(mcp){
+    S.mcp = mcp;
+    mcp.watchTool(SERVER, TOOL, INPUT, function(ev){
+      if (ev.type === "data") onData(ev.result); else onError(ev.error);
+    }, { cache: { staleTime: 600000, gcTime: 604800000 }, refetchInterval: 1800000 });
+  }
+  function refresh(){
+    if (!S.mcp) return;
+    $("sub").textContent = "Actualizando…";
+    S.mcp.callTool(SERVER, TOOL, INPUT, { cache: { staleTime: 600000, gcTime: 604800000, refresh: true } })
+      .then(function(res){ onData(res); }, function(err){ onError(err); });
+  }
+
+  /* ---------- reseñas (db) ---------- */
+  function startDb(db){
+    S.db = db; S.dbState = "ok";
+    db.collection("reviews").onSnapshot(function(snap){
+      var m = {};
+      snap.docs.forEach(function(d){ if (d.exists) m[d.id] = d.data(); });
+      S.reviews = m; render();
+    }, function(){ S.dbState = "error"; render(); });
+    db.doc("meta/sync").onSnapshot(function(d){ S.sync = d.exists ? d.data() : null; render(); }, function(){});
+  }
+  function saveReview(id, patch, okMsg){
+    if (!S.db) { toast("Para guardar, abrí la página con tu cuenta de claude.ai."); return; }
+    if (S.saving[id]) return;
+    var cur = Object.assign({ guestReviewed: false, rating: null, hostReviewed: false, reminded: false }, S.reviews[id] || {});
+    var next = Object.assign({}, cur, patch, { updatedAt: new Date().toISOString() });
+    S.saving[id] = true;
+    S.reviews[id] = next; render();
+    S.db.collection("reviews").doc(id).set(next).then(function(){
+      S.saving[id] = false; if (okMsg) toast(okMsg);
+    }, function(e){
+      S.saving[id] = false; S.reviews[id] = cur; render();
+      toast(e && e.code === "invalid_argument" ? "Solo el dueño de la página puede marcar reseñas." : "No se pudo guardar. Probá de nuevo.");
+    });
+  }
+
+  /* ---------- mensajes ---------- */
+  function phoneOf(r){ var p = (S.reviews[r.id] || {}).guestPhone; return p ? String(p) : ""; }
+  function waHref(r, lang){ var d = phoneOf(r).replace(/\D/g, ""); return d ? "https://wa.me/" + d + "?text=" + encodeURIComponent(message(r, lang)) : ""; }
+  function phoneLine(r){
+    var p = phoneOf(r);
+    if (!p) return "";
+    return '<span class="phone"><span class="mono">' + esc(p) + '</span> <a class="link" href="https://wa.me/' + p.replace(/\D/g, "") + '" target="_blank" rel="noopener">WhatsApp ↗</a></span>';
+  }
+  function message(r, lang){
+    var l = L(r.listing), rv = S.reviews[r.id] || {}, place = l.city || l.name;
+    if (lang === "en") {
+      return "Hi! Thank you so much for staying with us in " + place + ". It was a pleasure hosting you." +
+        (rv.hostReviewed ? " I've already left a review for you on Airbnb." : "") +
+        " If you have a minute, a review of your stay would help us a lot. Hope to host you again!";
+    }
+    return "¡Hola! Muchas gracias por elegir nuestro departamento en " + place + ". Fue un gusto recibirte." +
+      (rv.hostReviewed ? " Ya te dejé mi evaluación en Airbnb." : "") +
+      " Si tenés un minuto, nos ayudaría muchísimo que dejes la tuya sobre la estadía. ¡Te esperamos de nuevo!";
+  }
+  function copy(text){
+    var done = function(){ S.copyFallback = null; toast("Mensaje copiado. Pegalo en el chat de la reserva en Airbnb."); render(); };
+    try {
+      navigator.clipboard.writeText(text).then(done, function(){ S.copyFallback = text; render(); selectFallback(); });
+    } catch (e) { S.copyFallback = text; render(); selectFallback(); }
+  }
+  function selectFallback(){ var t = document.querySelector("textarea.copybox"); if (t) { t.focus(); t.select(); } }
+
+  var toastTimer;
+  function toast(t){ var el = $("toast"); el.textContent = t; el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(function(){ el.hidden = true; }, 3200); }
+
+  /* ---------- render ---------- */
+  function rateUI(id){
+    var s = "";
+    for (var i = 1; i <= 5; i++) s += '<button class="star" type="button" data-action="rate" data-id="' + esc(id) + '" data-n="' + i + '" aria-label="' + i + ' estrellas">' + i + '★</button>';
+    return '<div class="rate"><span class="muted" style="font-size:.85rem">¿Qué nota te dejó?</span>' + s +
+      '<button class="btn small" type="button" data-action="rate" data-id="' + esc(id) + '" data-n="0">Sin ver la nota</button>' +
+      '<button class="btn small" type="button" data-action="rate-close">Cancelar</button></div>';
+  }
+  function cellsHTML(since){
+    var c = "";
+    for (var i = 0; i < WINDOW; i++) c += '<i class="' + (i < since ? "used" : "left") + '"></i>';
+    return '<div class="cells" aria-hidden="true">' + c + '</div>';
+  }
+  function starsHTML(n, big){
+    if (!n) return '<span class="muted">Recibida, sin nota cargada</span>';
+    return '<span class="score"><span class="stars" aria-label="' + n + ' de 5 estrellas"' + (big ? "" : ' style="font-size:.95rem"') + '>' + "★★★★★".slice(0, n) + '<span class="off">' + "★★★★★".slice(n) + '</span></span><b>' + n + ',0</b></span>';
+  }
+  function guestHTML(r, from){
+    var rv = S.reviews[r.id] || {};
+    if (S.nameEdit === r.id && S.nameFrom === from) {
+      return '<form class="name-form" data-id="' + esc(r.id) + '"><input id="gname" type="text" maxlength="80" autocomplete="off" placeholder="Nombre del huésped" aria-label="Nombre del huésped" value="' + esc(S.nameDraft) + '">' +
+        '<button class="btn small primary" type="submit">Guardar</button><button class="btn small" type="button" data-action="name-cancel">Cancelar</button></form>';
+    }
+    var can = S.db ? '' : ' disabled';
+    if (rv.guestName) return '<span class="guest">' + esc(rv.guestName) + '</span> <button class="link" type="button" data-action="name-edit" data-from="' + from + '" data-id="' + esc(r.id) + '"' + can + '>editar</button>';
+    return '<span class="guest none">Huésped sin nombre</span> <button class="link" type="button" data-action="name-edit" data-from="' + from + '" data-id="' + esc(r.id) + '"' + can + '>+ agregar nombre</button>';
+  }
+  function cardHead(r, right){
+    var l = L(r.listing);
+    return '<div class="rv-top"><div style="min-width:0;display:flex;flex-direction:column;gap:4px">' +
+      '<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">' + guestHTML(r, "card") + '</div>' +
+      '<div class="rv-sub"><span class="dot" style="--dot:' + l.color + '"></span>' + esc(l.label) + ' <span class="mono">' + esc(r.id) + '</span></div>' +
+      (phoneOf(r) ? '<div class="rv-sub">' + phoneLine(r) + '</div>' : '') +
+      '<div class="rv-meta">Salió el ' + fmt(r.outD, { weekday: "short", day: "numeric", month: "short" }) + ' · ' + plural(r.nights, "noche", "noches") + ' · ' + money(r.revenue) + '</div></div>' +
+      right + '</div>';
+  }
+  function isoDay(v){ var t = Date.parse(String(v).slice(0, 10) + "T00:00:00Z"); return isFinite(t) ? Math.round(t / DAY) : null; }
+  function statusHTML(r){
+    var rv = S.reviews[r.id] || {}, st = reviewState(r), theirs;
+    if (rv.guestReviewed) theirs = rv.rating ? starsHTML(rv.rating, false) : '<span class="pill received">Recibida</span>';
+    else if (st.k === "pending") theirs = '<span class="pill pending">Todavía no · ' + (st.left === 0 ? "hoy es su último día" : "le quedan " + plural(st.left, "día", "días")) + '</span>';
+    else if (st.k === "expired") theirs = '<span class="pill expired">No te evaluó · el plazo venció el ' + fmt(r.outD + WINDOW - 1) + '</span>';
+    else theirs = '<span class="pill pending">Todavía no</span>';
+    var mine = rv.hostReviewed ? '<span class="pill received">✓ Ya lo evaluaste</span>' : '<span class="pill pending">Te falta evaluarlo</span>';
+    var rem = "";
+    if (st.k === "pending") {
+      var rd = rv.remindedAt ? isoDay(rv.remindedAt) : null;
+      var wd = rv.waAt ? isoDay(rv.waAt) : null;
+      rem = '<div class="st"><span class="st-l">Recordatorio:</span>' + (rv.reminded ? '<span class="pill received">✓ Enviado por Airbnb' + (rd != null ? ' el ' + fmt(rd) : '') + '</span>' : '<span class="pill pending">No enviado por Airbnb</span>') +
+        (wd != null ? '<span class="pill received">✓ WhatsApp abierto el ' + fmt(wd) + '</span>' : '') + '</div>';
+    }
+    return '<div class="status"><div class="st"><span class="st-l">Su reseña:</span>' + theirs + '</div><div class="st"><span class="st-l">Tu reseña:</span>' + mine + '</div>' + rem + '</div>';
+  }
+  function reviewCard(r, st){
+    var rv = S.reviews[r.id] || {};
+    var urgent = st.k === "pending" && st.left <= 3;
+    var label = st.k === "pending"
+      ? '<span>Día ' + Math.min(st.since, WINDOW) + ' de ' + WINDOW + '</span><b>' + (st.left === 0 ? "Último día" : "Quedan " + plural(st.left, "día", "días")) + '</b>'
+      : '<span>Venció el ' + fmt(r.outD + WINDOW) + '</span>';
+    var dis = S.db ? "" : " disabled";
+    var right = st.k === "pending" ? '<div class="window">' + cellsHTML(st.since) + '<div class="window-label">' + label + '</div></div>' : '<div class="window-label muted">' + label + '</div>';
+    return '<article class="rv' + (urgent ? " urgent" : "") + '">' + cardHead(r, right) + statusHTML(r) +
+      '<div class="rv-actions">' +
+        (st.k === "pending" && phoneOf(r) ?
+          '<a class="btn primary small" href="' + esc(waHref(r, "es")) + '" target="_blank" rel="noopener" data-action="wa" data-id="' + esc(r.id) + '">Pedir reseña por WhatsApp</a>' +
+          '<a class="btn small" href="' + esc(waHref(r, "en")) + '" target="_blank" rel="noopener" data-action="wa" data-id="' + esc(r.id) + '">WhatsApp in English</a>' : "") +
+        (st.k === "pending" && !phoneOf(r) ? '<span class="muted" style="font-size:.85rem">Sin teléfono guardado: Airbnb solo lo muestra durante la estadía.</span>' : "") +
+        (st.k === "pending" && !rv.reminded && !phoneOf(r) ?
+          '<button class="btn small" type="button" data-action="copy" data-lang="es" data-id="' + esc(r.id) + '">Copiar recordatorio</button>' : "") +
+        '<a class="btn small" href="https://www.airbnb.com.ar/hosting/stay/' + encodeURIComponent(r.id) + '" target="_blank" rel="noopener">Abrir en Airbnb ↗</a>' +
+      '</div>' +
+      (S.rateOpen === r.id && S.rateFrom === "card" ? rateUI(r.id) : "") +
+      '</article>';
+  }
+  function doneCard(r){
+    var rv = S.reviews[r.id] || {};
+    return '<article class="rv done">' + cardHead(r, starsHTML(rv.rating, true)) + statusHTML(r) +
+      '<div class="rv-actions"><a class="btn small" href="https://www.airbnb.com.ar/hosting/stay/' + encodeURIComponent(r.id) + '" target="_blank" rel="noopener">Abrir en Airbnb ↗</a></div>' +
+      '</article>';
+  }
+
+  function renderBanners(){
+    var b = [];
+    if (S.mcpState === "none") b.push('<div class="banner warn">Para ver tus reservas, abrí esta página en claude.ai con tu cuenta, donde PriceLabs está conectado.</div>');
+    if (S.mcpErr && (S.mcpState === "denied" || S.mcpState === "error" || S.mcpState === "stale")) {
+      var c = S.mcpErr.code, t;
+      if (c === "needs_reauth") t = "La conexión con PriceLabs venció. Reconectala en claude.ai → Configuración → Conectores y volvé a abrir esta página.";
+      else if (c === "server_not_connected" || c === "server_not_found") t = "PriceLabs no está conectado en esta cuenta. Agregalo en claude.ai → Configuración → Conectores.";
+      else if (c === "selection_required") t = "Tenés más de una conexión de PriceLabs. Elegí cuál usar cuando claude.ai te lo pregunte.";
+      else if (c === "not_in_manifest" || c === "consent_required") t = "Esta página no tiene permiso para leer PriceLabs. Activalo desde el menú de permisos de la página.";
+      else if (c === "approval_required") t = 'Falta tu aprobación para leer las reservas de PriceLabs. <button class="btn small primary" type="button" data-action="approve">Permitir y cargar</button>';
+      else if (c === "blocked_by_policy") t = "Tu organización bloquea esta función de PriceLabs.";
+      else if (c === "tool_error") t = "PriceLabs respondió con un error" + (S.mcpErr.message ? ": " + esc(S.mcpErr.message) : ".") + ' <button class="btn small" type="button" data-action="refresh">Reintentar</button>';
+      else if (c === "not_granted" || c === "capability_disabled" || c === "capability_removed") t = "Esta vista no puede conectarse a PriceLabs. Abrí la página en claude.ai.";
+      else t = (S.loaded ? "PriceLabs no respondió; ves los últimos datos cargados." : "PriceLabs no respondió.") + ' <button class="btn small" type="button" data-action="refresh">Reintentar</button>';
+      b.push('<div class="banner ' + (S.mcpState === "stale" ? "warn" : "bad") + '">' + t + '</div>');
+    }
+    if (S.dbState === "none" || S.dbState === "error") b.push('<div class="banner warn">Las marcas de reseñas no se pueden guardar en esta vista. Abrí la página en claude.ai con tu cuenta para registrarlas.</div>');
+    if (S.copyFallback) b.push('<div class="banner"><div style="flex:1;min-width:0"><div style="margin-bottom:6px">No se pudo copiar automáticamente. El texto está seleccionado: copialo a mano.</div><textarea class="copybox" id="copybox" readonly>' + esc(S.copyFallback) + '</textarea></div><button class="btn small" type="button" data-action="copy-close">Listo</button></div>');
+    $("banners").innerHTML = b.join("");
+  }
+
+  function who(r){ var n = rvOf(r).guestName; return n ? '<b>' + esc(n) + '</b> ' : ''; }
+  function chatHTML(r){
+    var c = rvOf(r).chat; if (!c) return "";
+    var pend = (c.pending || []).filter(Boolean), h = "";
+    if (c.summary) h += '<div class="chatsum">' + esc(c.summary) + (c.updatedAt ? ' <span class="muted">· chat leído el ' + esc(new Date(c.updatedAt).toLocaleDateString("es-AR", { day: "numeric", month: "short" }).replace(".", "")) + '</span>' : '') + '</div>';
+    if (pend.length) h += '<div class="chatpend"><b>Sin responder:</b> ' + pend.map(esc).join(" · ") + '</div>';
+    return h;
+  }
+  function renderToday(){
+    $("today-date").textContent = fmt(TODAY, { weekday: "long", day: "numeric", month: "long" });
+    if (!S.loaded) { $("today").innerHTML = '<div class="empty skel">' + (S.mcpState === "loading" ? "Buscando quién está en cada departamento…" : "Sin datos de PriceLabs todavía.") + '</div>'; return; }
+    var booked = S.res.filter(function(r){ return r.status === "booked"; });
+    $("today").innerHTML = S.listings.map(function(l){
+      var mine = booked.filter(function(r){ return r.listing === l.id; });
+      var cur = mine.filter(function(r){ return r.inD <= TODAY && r.outD > TODAY; })[0];
+      var outT = mine.filter(function(r){ return r.outD === TODAY; })[0];
+      var inT = mine.filter(function(r){ return r.inD === TODAY; })[0];
+      var nxt = mine.filter(function(r){ return r.inD > TODAY; })[0];
+      var lines = [];
+      var ph = function(r){ return (phoneOf(r) ? '<div style="font-size:.88rem">' + phoneLine(r) + '</div>' : '') + chatHTML(r); };
+      if (outT) lines.push('<div class="prop-state"><span class="tag out">Sale hoy</span>' + who(outT) + '<span class="mono muted">' + esc(outT.id) + '</span></div>' + ph(outT));
+      if (inT) lines.push('<div class="prop-state"><span class="tag in">Entra hoy</span>' + who(inT) + '<span class="mono muted">' + esc(inT.id) + '</span> · ' + plural(inT.nights, "noche", "noches") + '</div>' + ph(inT));
+      else if (cur) lines.push('<div class="prop-state"><span class="tag in">Ocupado</span>' + who(cur) + 'hasta el <b>' + fmt(cur.outD, { weekday: "short", day: "numeric", month: "short" }) + '</b> <span class="mono muted">' + esc(cur.id) + '</span></div>' + ph(cur));
+      if (!cur && !inT) lines.push('<div class="prop-state"><span class="tag free">Libre</span>' + (nxt ? 'próximo ingreso el <b>' + fmt(nxt.inD, { weekday: "short", day: "numeric", month: "short" }) + '</b> (en ' + plural(nxt.inD - TODAY, "día", "días") + ')' + (rvOf(nxt).guestName ? ' · ' + esc(rvOf(nxt).guestName) : '') : 'sin reservas a la vista') + '</div>');
+      else if (nxt) lines.push('<div class="muted" style="font-size:.88rem">Después: ingreso el ' + fmt(nxt.inD) + (rvOf(nxt).guestName ? ' · ' + esc(rvOf(nxt).guestName) : '') + '</div>');
+      return '<div class="prop"><div class="prop-name"><span class="dot" style="--dot:' + l.color + '"></span>' + esc(l.label) + '</div>' +
+        '<div class="muted" style="font-size:.82rem;margin-top:-6px">' + esc(l.name) + '</div>' + lines.join("") + '</div>';
+    }).join("") || '<div class="empty">No hay departamentos con reservas en PriceLabs.</div>';
+  }
+
+  function renderReviews(){
+    var el = $("reviews"), cnt = $("rv-count");
+    if (!S.loaded) {
+      el.innerHTML = '<div class="empty skel">' + (S.mcpState === "loading" ? "Revisando checkouts recientes…" : "Las reseñas pendientes aparecen cuando carguen las reservas.") + '</div>';
+      cnt.hidden = true; $("rv-props").innerHTML = ""; $("rv-views").innerHTML = ""; return;
+    }
+    if (!S.rvProp || (S.rvProp !== "all" && !S.listings.some(function(l){ return l.id === S.rvProp; }))) S.rvProp = S.listings.length ? S.listings[0].id : "all";
+    var perProp = {}, totalPending = 0, pending = [], expired = [], done = [];
+    S.res.forEach(function(r){
+      var st = reviewState(r);
+      if (st.k === "pending") { perProp[r.listing] = (perProp[r.listing] || 0) + 1; totalPending++; }
+      if (S.rvProp !== "all" && r.listing !== S.rvProp) return;
+      if (st.k === "pending") pending.push([r, st]);
+      else if (st.k === "expired" && st.since <= 60) expired.push([r, st]);
+      else if (st.k === "received" && st.since <= 60) done.push([r, st]);
+    });
+    pending.sort(function(a, b){ return a[1].left - b[1].left; });
+    expired.sort(function(a, b){ return a[1].since - b[1].since; });
+    done.sort(function(a, b){ return a[1].since - b[1].since; });
+    cnt.hidden = !totalPending; cnt.textContent = totalPending;
+
+    $("rv-props").hidden = S.listings.length < 2;
+    $("rv-props").innerHTML = S.listings.map(function(l){
+      return '<button type="button" data-rvprop="' + esc(l.id) + '" aria-pressed="' + (S.rvProp === l.id) + '"><span class="dot" style="--dot:' + l.color + ';display:inline-block;width:8px;height:8px;margin-right:6px"></span>' + esc(l.label) + '<span class="n">' + (perProp[l.id] || 0) + '</span></button>';
+    }).join("") + (S.listings.length > 1 ? '<button type="button" data-rvprop="all" aria-pressed="' + (S.rvProp === "all") + '">Todos<span class="n">' + totalPending + '</span></button>' : "");
+    $("rv-views").innerHTML =
+      '<button type="button" data-rvview="pending" aria-pressed="' + (S.rvView === "pending") + '">Pendientes<span class="n">' + pending.length + '</span></button>' +
+      '<button type="button" data-rvview="done" aria-pressed="' + (S.rvView === "done") + '">Ya evaluadas<span class="n">' + done.length + '</span></button>';
+
+    var where = S.rvProp === "all" ? "" : " en " + L(S.rvProp).label;
+    var h;
+    if (S.rvView === "done") {
+      h = done.length
+        ? '<div class="rv-list">' + done.map(function(x){ return doneCard(x[0]); }).join("") + '</div>'
+        : '<div class="empty">Todavía no marcaste reseñas recibidas' + esc(where) + ' en los últimos 60 días. Cuando un huésped te evalúe, tocá “Registrar su reseña” en Pendientes y cargá la nota.</div>';
+    } else {
+      h = pending.length
+        ? '<div class="rv-list">' + pending.map(function(x){ return reviewCard(x[0], x[1]); }).join("") + '</div>'
+        : '<div class="empty">No hay reseñas pendientes' + esc(where) + ': los huéspedes de los últimos 14 días ya te evaluaron o todavía no hicieron checkout.</div>';
+      if (expired.length) h += '<details class="expired"' + (expired.some(function(x){ return (S.rateOpen === x[0].id && S.rateFrom === "card") || (S.nameEdit === x[0].id && S.nameFrom === "card"); }) ? " open" : "") + '><summary>' + plural(expired.length, "estadía", "estadías") + esc(where) + ' de los últimos 60 días quedaron sin reseña marcada</summary><div class="rv-list">' +
+        expired.map(function(x){ return reviewCard(x[0], x[1]); }).join("") + '</div></details>';
+    }
+    el.innerHTML = h;
+  }
+
+  function renderTiles(){
+    var y = dt(TODAY).getUTCFullYear(), m = dt(TODAY).getUTCMonth();
+    var mStart = Math.round(Date.UTC(y, m, 1) / DAY), mEnd = Math.round(Date.UTC(y, m + 1, 1) / DAY);
+    $("month-name").textContent = dt(TODAY).toLocaleDateString("es-AR", { month: "long", year: "numeric", timeZone: "UTC" });
+    if (!S.loaded) { $("tiles").innerHTML = '<div class="empty skel" style="grid-column:1/-1">Los números del mes aparecen cuando carguen las reservas.</div>'; return; }
+    var nights = 0, rev = 0;
+    S.res.forEach(function(r){
+      if (r.status !== "booked") return;
+      var a = Math.max(r.inD, mStart), b = Math.min(r.outD, mEnd);
+      if (b > a) { nights += b - a; rev += r.revenue * (b - a) / Math.max(1, r.outD - r.inD); }
+    });
+    var cap = (mEnd - mStart) * Math.max(1, S.listings.length);
+    var occ = Math.round(100 * nights / cap);
+    var rated = [], got = 0, closed = 0;
+    S.res.forEach(function(r){
+      if (r.status !== "booked" || r.outD > TODAY) return;
+      var rv = S.reviews[r.id];
+      if (rv && rv.guestReviewed && rv.rating) rated.push(rv.rating);
+      var since = TODAY - r.outD;
+      if (since >= WINDOW && since < WINDOW + 90) { closed++; if (rv && rv.guestReviewed) got++; }
+    });
+    var avg = rated.length ? (rated.reduce(function(s, v){ return s + v; }, 0) / rated.length) : null;
+    var rate = closed ? Math.round(100 * got / closed) : null;
+    $("tiles").innerHTML =
+      '<div class="tile"><span class="eyebrow">Ocupación</span><span class="v">' + occ + '%</span><span class="h">' + plural(nights, "noche vendida", "noches vendidas") + ' de ' + cap + '</span><div class="bar"><span style="width:' + Math.min(100, occ) + '%"></span></div></div>' +
+      '<div class="tile"><span class="eyebrow">Ingreso del mes</span><span class="v">' + money(rev) + '</span><span class="h">Por las noches dentro del mes</span></div>' +
+      '<div class="tile"><span class="eyebrow">Nota promedio</span><span class="v">' + (avg ? avg.toFixed(2).replace(".", ",") + ' ★' : "—") + '</span><span class="h">' + (avg ? "De " + plural(rated.length, "reseña marcada", "reseñas marcadas") : "Marcá reseñas con “Me evaluó” para verla") + '</span></div>' +
+      '<div class="tile"><span class="eyebrow">Tasa de reseñas</span><span class="v">' + (rate === null ? "—" : rate + "%") + '</span><span class="h">' + (closed ? got + " de " + closed + " estadías con la ventana cerrada (90 días)" : "Aún no hay ventanas cerradas") + '</span></div>';
+  }
+
+  function renderBook(){
+    Array.prototype.forEach.call($("tabs").querySelectorAll("button"), function(b){ b.setAttribute("aria-pressed", String(b.getAttribute("data-tab") === S.tab)); });
+    var chips = '<button type="button" data-prop="all" aria-pressed="' + (S.prop === "all") + '">Todos</button>' +
+      S.listings.map(function(l){ return '<button type="button" data-prop="' + esc(l.id) + '" aria-pressed="' + (S.prop === l.id) + '">' + esc(l.label) + '</button>'; }).join("");
+    $("props").innerHTML = chips; $("props").hidden = S.listings.length < 2;
+    if (!S.loaded) { $("rows").innerHTML = '<div class="empty skel">' + (S.mcpState === "loading" ? "Cargando reservas desde PriceLabs…" : "Sin reservas para mostrar.") + '</div>'; return; }
+    var list = S.res.filter(function(r){
+      if (S.prop !== "all" && r.listing !== S.prop) return false;
+      var k = reviewState(r).k;
+      if (S.tab === "cancelled") return k === "cancelled";
+      if (S.tab === "upcoming") return k === "upcoming";
+      if (S.tab === "stay") return k === "stay";
+      return k === "received" || k === "pending" || k === "expired";
+    });
+    if (S.tab === "past" || S.tab === "cancelled") list.reverse();
+    if (!list.length) { $("rows").innerHTML = '<div class="empty">' + ({ upcoming: "No hay reservas próximas.", stay: "Nadie está alojado ahora.", past: "No hay estadías terminadas en los últimos meses.", cancelled: "No hay cancelaciones." })[S.tab] + '</div>'; return; }
+    $("rows").innerHTML = '<div class="rows">' + list.map(function(r){
+      var l = L(r.listing), st = reviewState(r), pill = "";
+      if (st.k === "received") pill = st.rating ? starsHTML(st.rating, false) : '<span class="pill received">Reseña recibida</span>';
+      else if (st.k === "pending") pill = '<span class="pill pending">No te evaluó · quedan ' + plural(st.left, "día", "días") + '</span>';
+      else if (st.k === "expired") pill = '<span class="pill expired">No te evaluó · venció el ' + fmt(r.outD + WINDOW - 1) + '</span>';
+      if (st.k === "received" || st.k === "pending" || st.k === "expired") pill += rvOf(r).hostReviewed ? '<span class="pill received">✓ Lo evaluaste</span>' : '<span class="pill pending">Te falta evaluarlo</span>';
+      else if (st.k === "cancelled") pill = '<span class="pill cancelled">Cancelada</span>';
+      else if (st.k === "stay") pill = '<span class="pill stay">Alojado</span>';
+      else pill = '<span class="muted" style="font-size:.82rem">en ' + plural(r.inD - TODAY, "día", "días") + '</span>';
+      var canRate = false;
+      return '<div class="row' + (st.k === "cancelled" ? " cancel" : "") + '">' +
+        '<div class="cal"><div class="d">' + dt(r.inD).getUTCDate() + '</div><div class="m">' + fmt(r.inD, { month: "short" }) + '</div></div>' +
+        '<div class="row-main"><div class="l1">' + (S.nameEdit === r.id && S.nameFrom === "row" ? guestHTML(r, "row") : (rvOf(r).guestName ? esc(rvOf(r).guestName) : '<span class="muted" style="font-weight:600">Huésped sin nombre</span>') + (r.status === "cancelled" ? "" : ' <button class="link" type="button" data-action="name-edit" data-from="row" data-id="' + esc(r.id) + '"' + (S.db ? "" : " disabled") + '>' + (rvOf(r).guestName ? "editar" : "+ nombre") + '</button>')) + '</div>' +
+        '<div class="l2"><span class="dot" style="--dot:' + l.color + ';display:inline-block;width:8px;height:8px;margin-right:6px"></span>' + esc(l.label) + ' · <span class="mono">' + esc(r.id) + '</span></div>' +
+        (phoneOf(r) ? '<div class="l2">' + phoneLine(r) + '</div>' : '') +
+        '<div class="l2">' + fmt(r.inD) + ' → ' + fmt(r.outD) + ' · ' + plural(r.nights, "noche", "noches") + (r.bookedD != null ? ' · reservó el ' + fmt(r.bookedD) : "") + '</div>' + (r.status === "cancelled" ? "" : chatHTML(r)) + '</div>' +
+        '<div class="row-side"><span class="money">' + (r.status === "cancelled" ? "—" : money(r.revenue)) + '</span>' + pill +
+        (canRate ? '<button class="btn small" type="button" data-action="rate-open" data-from="row" data-id="' + esc(r.id) + '">' + (st.k === "received" ? "Cambiar su nota" : "Registrar su reseña") + '</button>' : "") + '</div>' +
+        (S.rateOpen === r.id && S.rateFrom === "row" ? rateUI(r.id) : "") +
+        '</div>';
+    }).join("") + '</div>';
+  }
+
+  function render(){
+    var sub = $("sub");
+    if (S.loaded && S.updatedAt) {
+      var t = new Date(S.updatedAt);
+      sub.textContent = plural(S.listings.length, "departamento", "departamentos") + " · " + plural(S.res.filter(function(r){ return r.status === "booked"; }).length, "reserva", "reservas") +
+        " · actualizado " + t.toLocaleDateString("es-AR", { day: "numeric", month: "short" }).replace(".", "") + " " + t.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+    } else sub.textContent = S.mcpState === "loading" ? "Cargando reservas…" : "Sin conexión con PriceLabs";
+    var sy = S.sync && S.sync.at ? new Date(S.sync.at) : null;
+    $("sync").textContent = sy && !isNaN(sy) ? "Reseñas, nombres y recordatorios leídos de Airbnb el " + sy.toLocaleDateString("es-AR", { day: "numeric", month: "short" }).replace(".", "") + " a las " + sy.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }) : "Reseñas, nombres y recordatorios: esperando la primera lectura de Airbnb";
+    $("refresh").disabled = !S.mcp;
+    var hadFocus = document.activeElement && document.activeElement.id === "gname";
+    var caret = hadFocus ? document.activeElement.selectionStart : null;
+    renderBanners(); renderToday(); renderReviews(); renderTiles(); renderBook();
+    var gi = $("gname");
+    if (gi && (hadFocus || S.focusName)) { gi.focus(); var pos = caret == null ? gi.value.length : caret; try { gi.setSelectionRange(pos, pos); } catch (e) {} S.focusName = false; }
+    if (S.copyFallback) selectFallback();
+  }
+
+  /* ---------- eventos ---------- */
+  function rvOf(r){ return S.reviews[r.id] || {}; }
+  function findRes(id){ for (var i = 0; i < S.res.length; i++) if (S.res[i].id === id) return S.res[i]; return null; }
+  document.addEventListener("click", function(e){
+    var t = e.target.closest("[data-action],[data-tab],[data-prop],[data-rvprop],[data-rvview]");
+    if (!t) return;
+    if (t.hasAttribute("data-tab")) { S.tab = t.getAttribute("data-tab"); S.rateOpen = null; render(); return; }
+    if (t.hasAttribute("data-prop")) { S.prop = t.getAttribute("data-prop"); render(); return; }
+    if (t.hasAttribute("data-rvprop")) { S.rvProp = t.getAttribute("data-rvprop"); S.rateOpen = null; S.nameEdit = null; render(); return; }
+    if (t.hasAttribute("data-rvview")) { S.rvView = t.getAttribute("data-rvview"); S.rateOpen = null; S.nameEdit = null; render(); return; }
+    var a = t.getAttribute("data-action"), id = t.getAttribute("data-id");
+    if (a === "wa") { var today = new Date(); var d = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" + String(today.getDate()).padStart(2, "0"); if ((S.reviews[id] || {}).waAt !== d) saveReview(id, { waAt: d }); return; }
+    if (a === "refresh") { if (S.view === "clean") document.dispatchEvent(new CustomEvent("libro:refresh-compras")); else refresh(); }
+    else if (a === "approve") refresh();
+    else if (a === "rate-open") { var from = t.getAttribute("data-from"); S.rateOpen = (S.rateOpen === id && S.rateFrom === from) ? null : id; S.rateFrom = from; render(); }
+    else if (a === "rate-close") { S.rateOpen = null; render(); }
+    else if (a === "rate") {
+      var n = Number(t.getAttribute("data-n")); S.rateOpen = null;
+      saveReview(id, { guestReviewed: true, rating: n || null }, n ? "Guardado: " + n + "★" : "Guardado como reseña recibida");
+    }
+    else if (a === "toggle") { var f = t.getAttribute("data-field"); var cur = (S.reviews[id] || {})[f]; var p = {}; p[f] = !cur; saveReview(id, p); }
+    else if (a === "copy") { var r = findRes(id); if (r) copy(message(r, t.getAttribute("data-lang"))); }
+    else if (a === "copy-close") { S.copyFallback = null; render(); }
+    else if (a === "name-edit") { S.nameEdit = id; S.nameFrom = t.getAttribute("data-from"); S.nameDraft = (S.reviews[id] || {}).guestName || ""; S.focusName = true; render(); }
+    else if (a === "name-cancel") { S.nameEdit = null; render(); }
+  });
+  document.addEventListener("submit", function(e){
+    var f = e.target.closest("form.name-form");
+    if (!f) return;
+    e.preventDefault();
+    var id = f.getAttribute("data-id"), v = ($("gname") ? $("gname").value : S.nameDraft).trim().slice(0, 80);
+    var cur = (S.reviews[id] || {}).guestName || "";
+    S.nameEdit = null;
+    if (v === cur) { render(); return; }
+    saveReview(id, { guestName: v }, v ? "Nombre guardado" : "Nombre borrado");
+  });
+  document.addEventListener("input", function(e){ if (e.target && e.target.id === "gname") S.nameDraft = e.target.value; });
+
+  /* ---------- secciones ---------- */
+  S.full = null;
+  S.view = location.hash === "#limpieza" ? "clean" : "main";
+  function applyView(){
+    var v = S.full ? S.view : "clean";
+    $("view-main").hidden = S.full === null || v !== "main";
+    $("view-clean").hidden = S.full === null || v !== "clean";
+    $("viewnav").hidden = !S.full;
+    Array.prototype.forEach.call(document.querySelectorAll("[data-view]"), function(b){ b.setAttribute("aria-pressed", String(b.getAttribute("data-view") === v)); });
+    $("refresh").hidden = !S.full;
+    $("sub").hidden = !S.full || v !== "main"; $("sync").hidden = !S.full || v !== "main";
+    $("apptitle").textContent = S.full === false ? "Limpieza Retiro" : "Libro de Huéspedes";
+  }
+  document.addEventListener("click", function(e){
+    var b = e.target.closest("[data-view]"); if (!b) return;
+    S.view = b.getAttribute("data-view");
+    try { history.replaceState(null, "", S.view === "clean" ? "#limpieza" : "#reservas"); } catch (err) {}
+    applyView(); window.scrollTo(0, 0);
+  });
+  window.addEventListener("hashchange", function(){ S.view = location.hash === "#limpieza" ? "clean" : "main"; applyView(); });
+
+  /* ---------- arranque ---------- */
+  render(); applyView();
+  var C = window.claude;
+  if (!C || typeof C.use !== "function") { S.full = false; S.mcpState = "none"; S.dbState = "none"; render(); applyView(); return; }
+  C.use("user").then(function(u){
+    return u ? Promise.all([u.isOwner(), u.canEdit()]).catch(function(){ return [false, false]; }) : [false, false];
+  }, function(){ return [false, false]; }).then(function(r){
+    if (r[0] || r[1]) return true;
+    return C.use("db").then(function(db){
+      if (!db) return false;
+      return db.collection("reviews").limit(1).get().then(function(snap){ return !snap.empty; }, function(){ return false; });
+    }, function(){ return false; });
+  }).then(function(full){
+    S.full = !!full;
+    applyView();
+    if (S.full) { window.__libroFull = true; document.dispatchEvent(new CustomEvent("libro:full")); }
+    if (!S.full) { S.mcpState = "none"; S.dbState = "none"; return; }
+    C.use("mcp").then(function(mcp){ if (!mcp) { S.mcpState = "none"; render(); return; } startMcp(mcp); render(); }, function(){ S.mcpState = "none"; render(); });
+    C.use("db").then(function(db){ if (!db) { S.dbState = "none"; render(); return; } startDb(db); }, function(){ S.dbState = "none"; render(); });
+  });
+})();
+</script>
+<script>
+(function(){
+  "use strict";
+  var DAY = 864e5;
+  var S = { stays: [], filter: "all", loaded: false, updatedAt: null };
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
+  function day(iso){ return Math.round(Date.parse(String(iso).slice(0, 10) + "T00:00:00Z") / DAY); }
+  function fmt(iso){ return new Date(day(iso) * DAY).toLocaleDateString("es-AR", { day: "numeric", month: "short", timeZone: "UTC" }).replace(".", ""); }
+  function stars(n){ var f = Math.round(n); return "★★★★★".slice(0, f) + '<span class="off">' + "★★★★★".slice(f) + '</span>'; }
+  function dec(n){ return n.toFixed(2).replace(".", ","); }
+
+  function render(){
+    var rated = S.stays.filter(function(s){ return typeof s.clean === "number"; });
+    if (!S.loaded) return;
+    $("c-sub").textContent = rated.length
+      ? rated.length + " evaluaciones desde el " + fmt(S.stays.slice().sort(function(a, b){ return a.inDate < b.inDate ? -1 : 1; })[0].inDate) + (S.updatedAt ? " · actualizado el " + new Date(S.updatedAt).toLocaleDateString("es-AR", { day: "numeric", month: "short" }).replace(".", "") : "")
+      : "Todavía no hay evaluaciones cargadas.";
+    if (rated.length) {
+      var avg = rated.reduce(function(t, s){ return t + s.clean; }, 0) / rated.length;
+      var five = rated.filter(function(s){ return s.clean === 5; }).length;
+      $("big").innerHTML = dec(avg) + "<small>/5</small>";
+      $("bigstars").innerHTML = stars(avg);
+      $("bigtext").textContent = five === rated.length ? "Todas las evaluaciones con 5 estrellas" : five + " de " + rated.length + " huéspedes dieron 5 estrellas";
+      var lows = rated.length - five, noRev = S.stays.length - rated.length;
+      $("split").innerHTML = '<span class="chip good">' + five + ' con 5★</span>' + (lows ? '<span class="chip warn">' + lows + ' con menos de 5★</span>' : '') + (noRev ? '<span class="chip none">' + noRev + ' sin evaluación</span>' : '');
+    }
+    // frases
+    var counts = {};
+    rated.forEach(function(s){ (s.chips || []).forEach(function(c){ c = c.replace(/\.$/, ""); counts[c] = (counts[c] || 0) + 1; }); });
+    var keys = Object.keys(counts).sort(function(a, b){ return counts[b] - counts[a]; });
+    $("praise").innerHTML = keys.length ? keys.map(function(k){
+      var pct = Math.round(100 * counts[k] / rated.length);
+      return '<div class="prow"><span class="t">' + esc(k) + '</span><span class="c">' + counts[k] + ' de ' + rated.length + '</span><div class="cbar" aria-hidden="true"><span style="width:' + pct + '%"></span></div></div>';
+    }).join("") : '<span class="muted">Todavía nadie marcó frases de limpieza.</span>';
+    // para mejorar
+    var imp = S.stays.filter(function(s){ return (typeof s.clean === "number" && s.clean < 5) || (s.issues && s.issues.length); });
+    $("improve").innerHTML = imp.length ? imp.map(function(s){ return card(s, true); }).join("") :
+      '<div class="empty">Ningún huésped marcó problemas de limpieza. ¡Muy buen trabajo!</div>';
+    // lista
+    var list = S.stays.slice().sort(function(a, b){ return a.outDate < b.outDate ? 1 : -1; }).filter(function(s){
+      if (S.filter === "comments") return (s.comments && s.comments.length) || (s.issues && s.issues.length);
+      if (S.filter === "low") return typeof s.clean === "number" && s.clean < 5;
+      return true;
+    });
+    $("stays").innerHTML = list.length ? list.map(function(s){ return card(s, false); }).join("") : '<div class="empty">No hay estadías con este filtro.</div>';
+  }
+  function card(s, focus){
+    var hasScore = typeof s.clean === "number";
+    var low = hasScore && s.clean < 5;
+    var h = '<article class="card' + (low ? " low" : "") + '"><div class="card-top"><div><div class="who">' + esc(s.first || "Huésped") + '</div>' +
+      '<div class="when">' + fmt(s.inDate) + ' → ' + fmt(s.outDate) + '</div></div>' +
+      (hasScore ? '<div class="score"><span class="stars" aria-label="' + s.clean + ' de 5 en limpieza">' + stars(s.clean) + '</span><b>' + s.clean + '</b></div>' : '<span class="chip none">' + (Math.round(Date.now() / DAY) - day(s.outDate) < 14 ? 'Todavía puede evaluar' : 'No dejó evaluación') + '</span>') + '</div>';
+    if (s.chips && s.chips.length) h += '<div class="tags">' + s.chips.map(function(c){ return '<span class="ctag">' + esc(c.replace(/\.$/, "")) + '</span>'; }).join("") + '</div>';
+    (s.issues || []).forEach(function(q){ h += '<p class="quote">' + esc(q.text) + '<span class="src">' + esc(q.src || "Comentario") + '</span></p>'; });
+    if (!focus) (s.comments || []).forEach(function(q){ h += '<p class="quote">' + esc(q.text) + '<span class="src">' + esc(q.src || "Comentario") + '</span></p>'; });
+    if (focus && low && !(s.issues && s.issues.length)) h += '<span class="muted" style="font-size:.88rem">Puso ' + s.clean + ' en limpieza sin explicar qué faltó.</span>';
+    return h + '</article>';
+  }
+
+  document.addEventListener("click", function(e){
+    var b = e.target.closest("[data-f]"); if (!b) return;
+    S.filter = b.getAttribute("data-f");
+    Array.prototype.forEach.call(document.querySelectorAll("#filter button"), function(x){ x.setAttribute("aria-pressed", String(x === b)); });
+    render();
+  });
+
+  var C = window.claude;
+  if (!C || typeof C.use !== "function") { $("c-sub").textContent = "Abrí esta página desde claude.ai para ver las evaluaciones."; return; }
+  C.use("db").then(function(db){
+    if (!db) { $("c-sub").textContent = "Abrí esta página con tu cuenta de claude.ai para ver las evaluaciones."; return; }
+    db.collection("stays").onSnapshot(function(snap){
+      S.stays = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return Object.assign({ id: d.id }, d.data()); });
+      S.loaded = true; render();
+    }, function(){ $("c-sub").textContent = "No se pudieron cargar las evaluaciones."; });
+    db.doc("meta/sync").onSnapshot(function(d){ S.updatedAt = d.exists ? d.data().at : null; render(); }, function(){});
+  }, function(){ $("c-sub").textContent = "No se pudieron cargar las evaluaciones."; });
+})();
+</script>
+<script>
+(function(){
+  "use strict";
+  var DAY = 864e5;
+  var S = { items: [], me: null, owner: false, canWrite: null, db: null, user: null, names: {}, busy: false };
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
+  function when(iso){ var d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString("es-AR", { day: "numeric", month: "short" }).replace(".", "") + " " + d.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }); }
+  function toast(msg){ var n = $("shop-note"); n.textContent = msg; n.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(function(){ n.hidden = true; }, 3500); }
+
+  function render(){
+    var pend = S.items.filter(function(i){ return i.status !== "bought"; }).sort(function(a, b){ return a.createdAt < b.createdAt ? 1 : -1; });
+    var cut = new Date(Date.now() - 30 * DAY).toISOString();
+    var done = S.items.filter(function(i){ return i.status === "bought" && (i.boughtAt || "") > cut; }).sort(function(a, b){ return a.boughtAt < b.boughtAt ? 1 : -1; });
+    $("shop-count").hidden = !pend.length; $("shop-count").textContent = pend.length;
+    if (S.live) $("shop-src").textContent = "En vivo desde la planilla del equipo · leída a las " + new Date(S.liveAt).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+    $("shop-list").innerHTML = pend.length ? pend.map(function(i){ return row(i, false); }).join("") : '<li class="muted">No hay nada pendiente de comprar.</li>';
+    $("shop-done").hidden = !done.length;
+    $("shop-done-list").innerHTML = done.map(function(i){ return row(i, true); }).join("");
+  }
+  function row(i, isDone){
+    var who = S.names[i.by] || i.by || "el equipo";
+    var meta = (isDone ? "Comprado el " + when(i.boughtAt) : "Pedido por " + who + " · " + when(i.createdAt));
+    var acts = "";
+    if (S.live) {
+      if (!isDone) acts += '<button class="btn small primary" type="button" data-live-act="bought" data-id="' + esc(i.id) + '">Comprado</button>';
+      acts += '<button class="btn small" type="button" data-live-act="delete" data-id="' + esc(i.id) + '">Borrar</button>';
+    }
+
+    return '<li><div class="si' + (isDone ? " done" : "") + '"><b>' + esc(i.text) + (i.qty ? ' · ' + esc(i.qty) : '') + '</b><span>' + esc(meta) + '</span></div>' + (acts ? '<div class="sa">' + acts + '</div>' : '') + '</li>';
+  }
+  function resolveNames(){
+    if (!S.user || !S.user.profiles) return;
+    var ids = S.items.map(function(i){ return i.by; }).filter(Boolean);
+    if (!ids.length) return;
+    S.user.profiles(ids).then(function(ps){ Object.keys(ps).forEach(function(k){ if (ps[k] && ps[k].name) S.names[k] = ps[k].name; }); render(); }, function(){});
+  }
+  function readOnly(msg){
+    $("shop-item").disabled = true; $("shop-qty").disabled = true; $("shop-add").disabled = true;
+    $("shop-note").textContent = msg; $("shop-note").hidden = false;
+  }
+
+  $("shop-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    if (S.live && LIVE && typeof LIVE.callTool === "function") { liveAdd(); return; }
+    if (!S.db || S.busy) return;
+    var text = $("shop-item").value.trim(), qty = $("shop-qty").value.trim();
+    if (!text) return;
+    S.busy = true; $("shop-add").disabled = true;
+    S.db.collection("compras").add({ text: text.slice(0, 80), qty: qty.slice(0, 20), by: S.me, status: "pending", createdAt: new Date().toISOString() }).then(function(){
+      $("shop-item").value = ""; $("shop-qty").value = ""; toast("Agregado a la lista.");
+    }, function(err){
+      if (err && err.code === "invalid_argument") readOnly("Para agregar cosas, pedile a Sebastian acceso de colaborador a esta página.");
+      else toast("No se pudo agregar. Probá de nuevo.");
+    }).then(function(){ S.busy = false; if (!$("shop-item").disabled) $("shop-add").disabled = false; });
+  });
+  document.addEventListener("click", function(e){
+    var b = e.target.closest("[data-shop]"); if (!b || !S.db) return;
+    var id = b.getAttribute("data-id"), act = b.getAttribute("data-shop");
+    b.disabled = true;
+    var ref = S.db.collection("compras").doc(id);
+    var job = act === "bought" ? ref.update({ status: "bought", boughtAt: new Date().toISOString() }) : ref.delete();
+    job.then(function(){ toast(act === "bought" ? "Marcado como comprado." : "Quitado de la lista."); }, function(){ b.disabled = false; toast("No se pudo guardar. Probá de nuevo."); });
+  });
+
+  var C = window.claude;
+  if (!C || typeof C.use !== "function") { readOnly("Abrí esta página desde claude.ai para ver y completar la lista."); $("shop-list").innerHTML = ""; return; }
+  Promise.all([C.use("db"), C.use("user")]).then(function(r){
+    var db = r[0], user = r[1];
+    if (!db) { readOnly("Abrí esta página con tu cuenta de claude.ai para ver y completar la lista."); $("shop-list").innerHTML = ""; return; }
+    S.db = db; S.user = user;
+    var ready = user ? Promise.all([user.id(), user.isOwner(), user.can("data.write")]) : Promise.resolve([null, false, null]);
+    ready.then(function(v){
+      S.me = v[0]; S.owner = !!v[1]; S.canWrite = v[2];
+      if (S.canWrite === false) readOnly("Podés ver la lista. Para agregar cosas, pedile a Sebastian acceso de colaborador a esta página.");
+      render();
+    }, function(){});
+    db.collection("compras").onSnapshot(function(snap){
+      if (S.live) return;
+      S.items = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return Object.assign({ id: d.id }, d.data()); });
+      render(); resolveNames();
+    }, function(){ $("shop-list").innerHTML = '<li class="muted">No se pudo cargar la lista.</li>'; });
+  });
+
+  /* ---- lista de compras en vivo desde Google Sheets (solo para el dueño) ---- */
+  var SHEET = "11ZfYPK0sUTD4c_qzBLnxutsreT91LnOGvQW4u0AhTPc";
+  var LIVE = null;
+  function parseAR(v){
+    var t = String(v || ""), m = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+    if (!m) return t;
+    return new Date(+m[3], +m[2] - 1, +m[1], +(m[4] || 0), +(m[5] || 0), +(m[6] || 0)).toISOString();
+  }
+  function fromSheet(p){
+    var v = (p && p.values) || [];
+    return v.slice(1).filter(function(r){ return r && r[0]; }).map(function(r){
+      return { id: String(r[0]), text: String(r[1] || ""), qty: String(r[2] || ""), by: String(r[3] || ""), createdAt: parseAR(r[4]),
+        status: String(r[5] || "") === "comprado" ? "bought" : "pending", boughtAt: parseAR(r[6]) };
+    });
+  }
+  function startLive(){
+    if (LIVE || !window.claude || typeof window.claude.use !== "function") return;
+    LIVE = "starting";
+    window.claude.use("mcp").then(function(mcp){
+      if (!mcp) { LIVE = null; return; }
+      LIVE = mcp;
+      $("shop-refresh").hidden = false;
+      mcp.watchTool("Google Sheets", "get_values", { spreadsheetId: SHEET, range: "Compras!A1:G500" }, function(ev){
+        if (ev.type === "data") {
+          S.live = true; S.items = fromSheet(ev.result && ev.result.payload);
+          S.liveAt = (ev.result && ev.result.cache && ev.result.cache.storedAt) || Date.now();
+          render(); resolveNames();
+        } else {
+          var c = ev.error && ev.error.code;
+          var msg = c === "needs_reauth" ? "Reconectá Google Sheets en claude.ai → Configuración → Conectores para ver la lista en vivo."
+            : c === "server_not_connected" ? "Conectá Google Sheets en claude.ai para ver la lista en vivo."
+            : c === "approval_required" || c === "not_in_manifest" ? "Permití que la app lea Google Sheets para ver la lista en vivo."
+            : "No se pudo leer la planilla ahora; ves la última copia.";
+          $("shop-src").textContent = msg;
+        }
+      }, { cache: { staleTime: 30000, gcTime: 86400000 }, refetchInterval: 60000 });
+    }, function(){ LIVE = null; });
+  }
+  function refreshLive(){
+    if (LIVE && typeof LIVE.invalidate === "function") { $("shop-src").textContent = "Actualizando…"; LIVE.invalidate("Google Sheets", "get_values").catch(function(){}); }
+    else startLive();
+  }
+  function liveAct(id, act, btn){
+    if (!LIVE || typeof LIVE.callTool !== "function") return;
+    btn.disabled = true;
+    $("shop-src").textContent = act === "delete" ? "Borrando…" : "Guardando…";
+    LIVE.callTool("Google Sheets", "get_values", { spreadsheetId: SHEET, range: "Compras!A1:A500" }, { cache: false }).then(function(res){
+      var v = (res && res.payload && res.payload.values) || [], row = -1;
+      for (var k = 1; k < v.length; k++) { if (v[k] && String(v[k][0]) === String(id)) { row = k + 1; break; } }
+      if (row < 0) throw { code: "gone" };
+      if (act === "delete") return LIVE.callTool("Google Sheets", "update_spreadsheet", { spreadsheetId: SHEET, requests: [{ deleteDimension: { range: { sheetId: 848263421, dimension: "ROWS", startIndex: row - 1, endIndex: row } } }] }, { cache: false });
+      return LIVE.callTool("Google Sheets", "update_values", { spreadsheetId: SHEET, range: "Compras!F" + row + ":G" + row, values: [["comprado", new Date().toISOString()]] }, { cache: false });
+    }).then(function(){ refreshLive(); }, function(err){
+      btn.disabled = false;
+      var c = err && err.code;
+      $("shop-src").textContent = c === "gone" ? "Ese pedido ya no está en la lista."
+        : (c === "approval_required" || c === "not_in_manifest") ? "Permití que la app modifique Google Sheets para usar este botón."
+        : "No se pudo guardar. Probá de nuevo.";
+      if (c === "gone") refreshLive();
+    });
+  }
+  function liveAdd(){
+    var text = $("shop-item").value.trim().slice(0, 80), qty = $("shop-qty").value.trim().slice(0, 20);
+    if (!text || S.busy) return;
+    S.busy = true; $("shop-add").disabled = true; $("shop-src").textContent = "Guardando…";
+    LIVE.callTool("Google Sheets", "get_values", { spreadsheetId: SHEET, range: "Compras!A1:A500" }, { cache: false }).then(function(res){
+      var v = (res && res.payload && res.payload.values) || [], n = v.length + 1;
+      var id = Math.random().toString(16).slice(2, 10);
+      return LIVE.callTool("Google Sheets", "update_values", { spreadsheetId: SHEET, range: "Compras!A" + n + ":G" + n, values: [[id, text, qty, "Sebastian", new Date().toISOString(), "pendiente", ""]] }, { cache: false });
+    }).then(function(){ $("shop-item").value = ""; $("shop-qty").value = ""; toast("Agregado a la lista."); refreshLive(); }, function(err){
+      var c = err && err.code;
+      $("shop-src").textContent = (c === "approval_required" || c === "not_in_manifest") ? "Permití que la app modifique Google Sheets para agregar." : "No se pudo agregar. Probá de nuevo.";
+    }).then(function(){ S.busy = false; $("shop-add").disabled = false; });
+  }
+  document.addEventListener("click", function(e){ var b = e.target.closest("[data-live-act]"); if (b) liveAct(b.getAttribute("data-id"), b.getAttribute("data-live-act"), b); });
+  document.addEventListener("libro:full", startLive);
+  document.addEventListener("libro:refresh-compras", refreshLive);
+  document.addEventListener("click", function(e){ if (e.target.closest("[data-refresh-compras]")) refreshLive(); });
+  if (window.__libroFull) startLive();
+})();
+</script>
+<script>
+/* ---- Limpieza: Semana (reserva actual + calendario) y Acciones (tareas), leídas de la planilla del equipo ---- */
+(function(){
+  "use strict";
+  var DAY = 864e5, SHEET = "11ZfYPK0sUTD4c_qzBLnxutsreT91LnOGvQW4u0AhTPc", TAREAS_SHEET_ID = 517659113;
+  var W = { up: null, tareas: null, compras: null, sel: null, mcp: null, busy: false, cv: "semana" };
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
+  function iso10(v){ var t = String(v || "").trim(), m = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/); return m ? m[3] + "-" + ("0" + m[2]).slice(-2) + "-" + ("0" + m[1]).slice(-2) : t.slice(0, 10); }
+  function parseAR(v){ var t = String(v || ""), m = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/); return m ? new Date(+m[3], +m[2] - 1, +m[1], +(m[4] || 0), +(m[5] || 0), +(m[6] || 0)).toISOString() : t; }
+  function dnum(s){ return Math.round(Date.parse(String(s).slice(0, 10) + "T00:00:00Z") / DAY); }
+  var MONEY_RE = /(\$|\busd\b|u\$s|\bars\b|\bpes[oa]s?\b|d[oó]lar|\beuros?\b|pag[oaué]|cobr|transfer|dep[oó]sit|reembols|devoluci[oó]n|tarifa|precio|cost[oó]|factur|\bse[ñn]a\b|efectivo|propina|\bplata\b|dinero|monto|cargo|tarjeta|mercado ?pago|\balias\b|\bcbu\b|\bcvu\b|money|refund|deposit|payment|\bfee\b|\bcash\b|\btip\b)/i;
+  function notesOf(v){ return String(v || "").split(/\s*\|\s*/).map(function(x){ return x.trim(); }).filter(function(x){ return x && !MONEY_RE.test(x); }).slice(0, 6); }
+  function todayN(){ var n = new Date(); return Math.round(Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()) / DAY); }
+  var WD = ["dom","lun","mar","mié","jue","vie","sáb"], MES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  function wd(n){ return WD[new Date(n * DAY).getUTCDay()]; }
+  function sd(n){ return new Date(n * DAY).toLocaleDateString("es-AR", { day: "numeric", month: "short", timeZone: "UTC" }).replace(".", ""); }
+  function longd(n){ return wd(n) + " " + sd(n); }
+  function rel(n, t){ var d = n - t; return d === 0 ? "hoy" : d === 1 ? "mañana" : "en " + d + " días"; }
+  function when(iso){ var d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString("es-AR", { day: "numeric", month: "short" }).replace(".", "") + " " + d.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }); }
+
+  /* sub-secciones */
+  function showCv(x){
+    W.cv = x;
+    Array.prototype.forEach.call(document.querySelectorAll("[data-cv-sec]"), function(n){ n.hidden = n.getAttribute("data-cv-sec") !== x; });
+    Array.prototype.forEach.call(document.querySelectorAll("#csub [data-cv]"), function(n){ n.setAttribute("aria-pressed", String(n.getAttribute("data-cv") === x)); });
+  }
+  showCv("semana");
+
+  function resCard(r, t){
+    var now = r.a <= t && r.b > t, pill;
+    if (r.b === t) pill = '<span class="wpill mint">Sale hoy</span>';
+    else if (now) pill = '<span class="wpill sky">En el depto ahora</span>';
+    else pill = '<span class="wpill lav">Llega ' + rel(r.a, t) + "</span>";
+    var g = r.guests ? '<span class="wpill butter">' + r.guests + (r.guests === 1 ? " huésped" : " huéspedes") + "</span>" : "";
+    var nights = r.b - r.a;
+    return '<article class="wres ' + (now || r.b === t ? "now" : "next") + '"><div class="wres-top"><div><div class="wres-name">' + esc(r.first) + '</div><div class="muted" style="font-size:.88rem">' + nights + (nights === 1 ? " noche" : " noches") + '</div></div><div class="split">' + pill + g + "</div></div>" +
+      '<div class="wio"><div><small>Ingreso</small><b>' + longd(r.a) + "</b>" + (r.inTime ? "<span>" + esc(r.inTime) + " h</span>" : '<span class="tbc">Horario a confirmar</span>') + "</div>" +
+      "<div><small>Salida</small><b>" + longd(r.b) + "</b>" + (r.outTime ? "<span>" + esc(r.outTime) + " h</span>" : '<span class="tbc">Horario a confirmar</span>') + "</div></div>" +
+      (function(){ var ns = notesOf(r.notes); return ns.length ? '<div class="wnotes"><small>Pedidos del huésped</small>' + ns.map(function(x){ return "<span>" + esc(x).replace(/\((a confirmar)\)/i, '<span class="tbc">($1)</span>') + "</span>"; }).join("") + "</div>" : ""; })() +
+      '<div class="wclean">Limpieza: ' + longd(r.b) + (r.outTime ? ", después de las " + esc(r.outTime) : ", después de la salida") + "</div></article>";
+  }
+  function renderCal(up, t){
+    if (!up.length) { $("wcal-sum").textContent = "No hay reservas aceptadas por delante."; $("wmonths").innerHTML = ""; $("wchips").innerHTML = ""; $("wdet").innerHTML = ""; return; }
+    var last = up[up.length - 1].b;
+    $("wcal-sum").textContent = "Hasta el " + longd(last) + " · " + up.length + (up.length === 1 ? " reserva" : " reservas");
+    if (W.sel !== null && !up[W.sel]) W.sel = null;
+    $("wchips").innerHTML = up.map(function(r, i){ return '<button type="button" class="wchip" data-wres="' + i + '" aria-pressed="' + (W.sel === i) + '">' + esc(r.first) + " · " + sd(r.a) + " – " + sd(r.b) + "</button>"; }).join("");
+    var d0 = new Date(t * DAY), y = d0.getUTCFullYear(), m = d0.getUTCMonth(), dl = new Date(last * DAY), ly = dl.getUTCFullYear(), lm = dl.getUTCMonth(), html = "";
+    while (y < ly || (y === ly && m <= lm)) {
+      var first = Math.round(Date.UTC(y, m, 1) / DAY), days = new Date(Date.UTC(y, m + 1, 0)).getUTCDate(), lead = (new Date(first * DAY).getUTCDay() + 6) % 7, g = "";
+      ["L","M","M","J","V","S","D"].forEach(function(w){ g += '<div class="wdh">' + w + "</div>"; });
+      for (var k = 0; k < lead; k++) g += "<div></div>";
+      for (var dd = 0; dd < days; dd++) {
+        var n = first + dd, cls = [], tag = "", ri = null, isIn = false, isOut = false;
+        up.forEach(function(r, i){
+          if (n === r.a) { isIn = true; ri = i; }
+          else if (n === r.b) { isOut = true; if (ri === null) ri = i; }
+          else if (n > r.a && n < r.b) { cls.push("occ"); ri = i; }
+        });
+        if (isIn && isOut) { cls = ["turn"]; tag = "sale/llega"; } else if (isIn) { cls = ["in"]; tag = "llega"; } else if (isOut) { cls = ["out"]; tag = "sale"; }
+        if (n < t) cls.push("past");
+        if (n === t) cls.push("today");
+        if (ri !== null && W.sel === ri) cls.push("sel");
+        g += ri !== null ? '<button type="button" class="wcd ' + cls.join(" ") + '" data-wres="' + ri + '" aria-label="' + longd(n) + ", " + esc(up[ri].first) + '">' + (dd + 1) + (tag ? "<small>" + tag + "</small>" : "") + "</button>"
+                         : '<div class="wcd ' + cls.join(" ") + '">' + (dd + 1) + "</div>";
+      }
+      html += '<div class="wmonth"><h4>' + MES[m] + " " + y + '</h4><div class="wgrid">' + g + "</div></div>";
+      m++; if (m > 11) { m = 0; y++; }
+    }
+    $("wmonths").innerHTML = html;
+    $("wdet").innerHTML = W.sel !== null ? resCard(up[W.sel], t) : '<p class="muted" style="margin:0;font-size:.9rem">Tocá una reserva o un día marcado para ver sus datos.</p>';
+  }
+  function future(){ var t = todayN(); return (W.up || []).filter(function(r){ return r.b >= t; }); }
+  function renderSemana(){
+    var t = todayN();
+    $("w-today").textContent = "Hoy " + longd(t);
+    if (W.up) {
+      var up = future(), cur = up.filter(function(r){ return r.a <= t; });
+      if (cur.length) { $("w-now-title").textContent = cur.length > 1 ? "Reservas de hoy" : "Reserva actual"; $("w-now").innerHTML = cur.map(function(r){ return resCard(r, t); }).join(""); }
+      else { var nx = up[0]; $("w-now-title").textContent = nx ? "Próxima llegada" : "Reserva actual"; $("w-now").innerHTML = nx ? resCard(nx, t) : '<div class="empty">No hay huéspedes ni llegadas cargadas.</div>'; }
+      renderCal(up, t);
+    }
+    var pend = (W.compras || []).filter(function(i){ return i.status !== "comprado"; });
+    var td = (W.tareas || []).filter(function(i){ return i.status !== "hecha"; });
+    if (W.compras) $("w-buy").innerHTML = pend.length ? pend.map(function(i){ return '<li><div class="si"><b>' + esc(i.text) + (i.qty ? " · " + esc(i.qty) : "") + "</b><span>" + (i.by ? "Pidió " + esc(i.by) : "") + "</span></div></li>"; }).join("") : '<li class="muted">Nada pendiente.</li>';
+    if (W.tareas) $("w-todo").innerHTML = td.length ? td.map(function(i){ return '<li><div class="si"><b>' + esc(i.text) + "</b><span>" + esc(i.by) + "</span></div></li>"; }).join("") : '<li class="muted">Nada pendiente.</li>';
+    var tot = pend.length + td.length; $("acc-count").hidden = !tot; $("acc-count").textContent = tot;
+    if (W.tareas) {
+      $("todo-count").hidden = !td.length; $("todo-count").textContent = td.length;
+      $("todo-list").innerHTML = td.length ? td.map(function(i){ return '<li><div class="si"><b>' + esc(i.text) + "</b><span>" + (i.by ? esc(i.by) + " · " : "") + esc(when(i.createdAt)) + '</span></div><div class="sa"><button class="btn small primary" type="button" data-todo="hecha" data-id="' + esc(i.id) + '">Hecha</button><button class="btn small" type="button" data-todo="quitar" data-id="' + esc(i.id) + '">Borrar</button></div></li>'; }).join("") : '<li class="muted">No hay nada pendiente de hacer.</li>';
+      var cut = Date.now() - 7 * DAY, dn = W.tareas.filter(function(i){ return i.status === "hecha" && Date.parse(i.doneAt) > cut; });
+      $("todo-done").hidden = !dn.length;
+      $("todo-done-list").innerHTML = dn.map(function(i){ return '<li><div class="si done"><b>' + esc(i.text) + "</b><span>Hecha " + esc(when(i.doneAt)) + '</span></div><div class="sa"><button class="btn small" type="button" data-todo="pendiente" data-id="' + esc(i.id) + '">Deshacer</button></div></li>'; }).join("");
+    }
+  }
+  function rows(p){ return ((p && p.values) || []).slice(1).filter(function(r){ return r && r[0]; }); }
+  function errMsg(ev){
+    var c = ev.error && ev.error.code;
+    return c === "needs_reauth" ? "Reconectá Google Sheets en claude.ai → Configuración → Conectores." : c === "server_not_connected" ? "Conectá Google Sheets en claude.ai." : "No se pudo leer la planilla ahora.";
+  }
+  function start(){
+    if (W.mcp || !window.claude || typeof window.claude.use !== "function") return;
+    W.mcp = "starting";
+    window.claude.use("mcp").then(function(mcp){
+      if (!mcp) { W.mcp = null; return; }
+      W.mcp = mcp;
+      var opt = { cache: { staleTime: 30000, gcTime: 86400000 }, refetchInterval: 60000 };
+      mcp.watchTool("Google Sheets", "get_values", { spreadsheetId: SHEET, range: "Proximas!A1:H300" }, function(ev){
+        if (ev.type !== "data") { if (!W.up) $("w-now").innerHTML = '<div class="empty">' + errMsg(ev) + "</div>"; return; }
+        W.up = rows(ev.result && ev.result.payload).map(function(r){
+          var a = iso10(r[2]), b = iso10(r[3]);
+          return { first: String(r[1] || "Huésped"), a: dnum(a), b: dnum(b), guests: r[4] ? Number(r[4]) : null, inTime: String(r[5] || "").trim(), outTime: String(r[6] || "").trim(), notes: String(r[7] || "") };
+        }).filter(function(r){ return !isNaN(r.a) && !isNaN(r.b); }).sort(function(x, y){ return x.a - y.a; });
+        renderSemana();
+      }, opt);
+      mcp.watchTool("Google Sheets", "get_values", { spreadsheetId: SHEET, range: "Tareas!A1:F500" }, function(ev){
+        if (ev.type !== "data") { $("todo-src").textContent = errMsg(ev); return; }
+        W.tareas = rows(ev.result && ev.result.payload).map(function(r){ return { id: String(r[0]), text: String(r[1] || ""), by: String(r[2] || ""), createdAt: parseAR(r[3]), status: String(r[4] || "pendiente"), doneAt: parseAR(r[5]) }; }).reverse();
+        $("todo-src").textContent = "En vivo desde la planilla del equipo · se revisa sola cada minuto.";
+        renderSemana();
+      }, opt);
+      mcp.watchTool("Google Sheets", "get_values", { spreadsheetId: SHEET, range: "Compras!A1:G500" }, function(ev){
+        if (ev.type !== "data") return;
+        W.compras = rows(ev.result && ev.result.payload).map(function(r){ return { id: String(r[0]), text: String(r[1] || ""), qty: String(r[2] || ""), by: String(r[3] || ""), status: String(r[5] || "pendiente") }; }).reverse();
+        renderSemana();
+      }, opt);
+    }, function(){ W.mcp = null; });
+  }
+  function refresh(){ if (W.mcp && typeof W.mcp.invalidate === "function") W.mcp.invalidate("Google Sheets", "get_values").catch(function(){}); }
+  function fail(err, el){ var c = err && err.code; $("todo-src").textContent = c === "gone" ? "Esa tarea ya no está." : (c === "approval_required" || c === "not_in_manifest") ? "Permití que la app modifique Google Sheets para usar este botón." : "No se pudo guardar. Probá de nuevo."; if (el) el.disabled = false; if (c === "gone") refresh(); }
+  function findRow(id){
+    return W.mcp.callTool("Google Sheets", "get_values", { spreadsheetId: SHEET, range: "Tareas!A1:A500" }, { cache: false }).then(function(res){
+      var v = (res && res.payload && res.payload.values) || [];
+      if (id === null) return v.length + 1;
+      for (var k = 1; k < v.length; k++) if (v[k] && String(v[k][0]) === String(id)) return k + 1;
+      throw { code: "gone" };
+    });
+  }
+  $("todo-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    var text = $("todo-item").value.trim().slice(0, 120);
+    if (!text || W.busy || !W.mcp || typeof W.mcp.callTool !== "function") return;
+    W.busy = true; $("todo-add").disabled = true; $("todo-src").textContent = "Guardando…";
+    findRow(null).then(function(n){
+      return W.mcp.callTool("Google Sheets", "update_values", { spreadsheetId: SHEET, range: "Tareas!A" + n + ":F" + n, values: [[Math.random().toString(16).slice(2, 10), text, "Sebastian", new Date().toISOString(), "pendiente", ""]] }, { cache: false });
+    }).then(function(){ $("todo-item").value = ""; $("todo-src").textContent = "Tarea agregada."; refresh(); }, function(err){ fail(err); })
+      .then(function(){ W.busy = false; $("todo-add").disabled = false; });
+  });
+  document.addEventListener("click", function(e){
+    var cv = e.target.closest("[data-cv]");
+    if (cv) { showCv(cv.getAttribute("data-cv")); if (!cv.closest("#csub")) window.scrollTo(0, 0); return; }
+    var wr = e.target.closest("[data-wres]");
+    if (wr) { var ix = Number(wr.getAttribute("data-wres")); W.sel = W.sel === ix ? null : ix; renderCal(future(), todayN()); if (W.sel !== null) $("wdet").scrollIntoView({ behavior: "smooth", block: "nearest" }); return; }
+    var b = e.target.closest("[data-todo]");
+    if (!b || !W.mcp || typeof W.mcp.callTool !== "function") return;
+    var id = b.getAttribute("data-id"), act = b.getAttribute("data-todo");
+    b.disabled = true; $("todo-src").textContent = act === "quitar" ? "Borrando…" : "Guardando…";
+    findRow(id).then(function(row){
+      if (act === "quitar") return W.mcp.callTool("Google Sheets", "update_spreadsheet", { spreadsheetId: SHEET, requests: [{ deleteDimension: { range: { sheetId: TAREAS_SHEET_ID, dimension: "ROWS", startIndex: row - 1, endIndex: row } } }] }, { cache: false });
+      return W.mcp.callTool("Google Sheets", "update_values", { spreadsheetId: SHEET, range: "Tareas!E" + row + ":F" + row, values: [[act === "hecha" ? "hecha" : "pendiente", act === "hecha" ? new Date().toISOString() : ""]] }, { cache: false });
+    }).then(function(){ $("todo-src").textContent = act === "quitar" ? "Tarea borrada." : act === "hecha" ? "Marcada como hecha." : "Volvió a pendientes."; refresh(); }, function(err){ fail(err, b); });
+  });
+  document.addEventListener("libro:full", start);
+  document.addEventListener("libro:refresh-compras", refresh);
+  if (window.__libroFull) start();
+  renderSemana();
+})();
+</script>
+
+<script>
+/* ---- Clave de acceso e instalación ---- */
+(function(){
+  "use strict";
+  function $(id){ return document.getElementById(id); }
+  if (!window.__libroKey()) {
+    $("gate").hidden = false;
+    $("gate-form").addEventListener("submit", function(e){
+      e.preventDefault();
+      var k = $("gate-key").value.trim().toUpperCase().replace(/\s+/g, "");
+      if (/^[A-Z0-9]{16}$/.test(k)) k = k.match(/.{4}/g).join("-");
+      $("gate-go").disabled = true; $("gate-err").hidden = true;
+      window.__libroApi({ op: "o_read" }, k).then(function(j){
+        try { localStorage.setItem("libro_clave", k); localStorage.setItem("libro_datos", JSON.stringify(j)); } catch (err) {}
+        location.reload();
+      }, function(err){
+        $("gate-err").textContent = err && err.code === "denied" ? "Clave incorrecta. Revisala y probá de nuevo." : "No se pudo conectar. Revisá internet y probá de nuevo.";
+        $("gate-err").hidden = false; $("gate-go").disabled = false;
+      });
+    });
+    return;
+  }
+  var ua = navigator.userAgent, deferred = null;
+  var isIOS = /iphone|ipad|ipod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  var isAndroid = /android/i.test(ua);
+  var standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  function seen(){ try { return localStorage.getItem("libro_instalar_visto") === "1"; } catch (e) { return false; } }
+  function markSeen(){ try { localStorage.setItem("libro_instalar_visto", "1"); } catch (e) {} }
+  var mini = document.createElement("div"); mini.className = "mini"; mini.hidden = true;
+  mini.innerHTML = '<span>Instalá el Libro en tu celular</span><button class="btn small primary" type="button" id="mini-go">Instalar</button>';
+  var nav = $("viewnav"); nav.parentNode.insertBefore(mini, nav);
+  function showInstall(){
+    $("inst").hidden = false;
+    $("i-android").hidden = !(isAndroid || (!isIOS && deferred));
+    $("i-ios").hidden = !isIOS;
+    $("i-desk").hidden = isIOS || isAndroid || !!deferred;
+    $("i-go").disabled = !deferred; $("i-wait").hidden = !!deferred;
+    if (!deferred && isAndroid) setTimeout(function(){ if (!deferred) { $("i-wait").hidden = true; $("i-manual").hidden = false; $("i-go").hidden = true; } }, 3500);
+  }
+  function hideInstall(){ $("inst").hidden = true; markSeen(); mini.hidden = standalone; }
+  window.addEventListener("beforeinstallprompt", function(e){
+    e.preventDefault(); deferred = e;
+    $("i-go").disabled = false; $("i-go").hidden = false; $("i-wait").hidden = true; $("i-manual").hidden = true;
+    if (!$("inst").hidden) { $("i-android").hidden = false; $("i-desk").hidden = true; }
+  });
+  $("i-go").addEventListener("click", function(){
+    if (!deferred) return;
+    deferred.prompt();
+    deferred.userChoice.then(function(c){ deferred = null; if (c.outcome === "accepted") { $("i-android").hidden = true; $("i-done").hidden = false; $("i-skip").textContent = "Ir al Libro"; } });
+  });
+  window.addEventListener("appinstalled", function(){ $("i-android").hidden = true; $("i-done").hidden = false; $("i-skip").textContent = "Ir al Libro"; mini.hidden = true; markSeen(); });
+  $("i-skip").addEventListener("click", hideInstall);
+  document.addEventListener("click", function(e){ if (e.target.closest("#mini-go")) showInstall(); });
+  if (!standalone) { if (seen()) mini.hidden = false; else showInstall(); }
+})();
+if ("serviceWorker" in navigator) window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js"); });
+</script>
+</body>
+</html>
