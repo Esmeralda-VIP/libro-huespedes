@@ -244,6 +244,93 @@ textarea.copybox{width:100%;min-height:110px;font:inherit;font-size:.88rem;borde
 .card h3{font-family:var(--f-display);font-size:1.05rem;margin:0;display:flex;align-items:center;gap:8px}
 #todo-form input{font:inherit;border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--surface);color:var(--ink);min-height:42px;min-width:0;flex:1 1 240px}
 [hidden]{display:none!important}
+
+/* ---- tema oscuro (opcional; el claro es el de siempre) ---- */
+:root{--chart:#4E7397;--chart-soft:#B7CBE0;--grid:#ECE8E1;--wcd-occ:#E2ECF6;--wcd-in:#ECE7F7;--wcd-out:#DDF0E4;--wcd-gap:#FDF0C9;--hero-a:#E8F0F8;--hero-b:#F1ECF8;--now-a:#EEF5FB;--next-a:#F3EFFA;--notes-bg:#FDF4D6;--notes-ink:#6B5212;--notes-h:#8A6D1C;--on-tile:#FFFFFF}
+:root[data-theme="dark"]{
+  --bg:#14171C; --surface:#1D2229; --ink:#E6E9ED; --muted:#9CA5B0; --line:#2D343D;
+  --accent:#8FB3D9; --accent-ink:#0F151C; --accent-soft:#223247;
+  --warn:#E3A56F; --warn-soft:#3A2B1D; --bad:#E7909B; --bad-soft:#3C2328;
+  --good:#7DC89D; --good-soft:#1C3227; --star:#E8BD5E; --cell:#2E353F;
+  --p1:#8FB3D9; --p2:#B5A5E6; --p3:#E0AE84;
+  --tile:#8FB3D9; --tile-soft:#223247; --none:#252B33;
+  --lav:#2C2742; --lav-ink:#CABEF2; --butter:#3A321B; --butter-ink:#ECD38C;
+  --chart:#8FB3D9; --chart-soft:#3C5672; --grid:#2A3038;
+  --wcd-occ:#223247; --wcd-in:#2C2742; --wcd-out:#1C3227; --wcd-gap:#3D3418;
+  --hero-a:#1F2A37; --hero-b:#272338; --now-a:#1F2A37; --next-a:#262238;
+  --notes-bg:#3A321B; --notes-ink:#EEDDA6; --notes-h:#D9BE6E; --on-tile:#0F151C;
+  color-scheme:dark;
+}
+.viewnav button[aria-pressed="true"]{color:var(--on-tile)}
+.hero{background:linear-gradient(135deg,var(--hero-a) 0%,var(--hero-b) 100%)}
+.wres.now{background:linear-gradient(135deg,var(--now-a) 0%,var(--surface) 70%)}.wres.next{background:linear-gradient(135deg,var(--next-a) 0%,var(--surface) 70%)}
+.wnotes{background:var(--notes-bg);color:var(--notes-ink)}.wnotes small{color:var(--notes-h)}.wnotes .tbc{color:var(--warn)}
+.wcd.occ{background:var(--wcd-occ)}.wcd.in{background:var(--wcd-in)}.wcd.out{background:var(--wcd-out)}.wcd.turn{background:linear-gradient(135deg,var(--wcd-out) 50%,var(--wcd-in) 50%)}
+:root[data-theme="dark"] .card,:root[data-theme="dark"] .wres,:root[data-theme="dark"] .wcal{box-shadow:none}
+.topbtns{display:flex;gap:8px;align-items:center}
+.btn.icon{width:38px;padding:0;justify-content:center;min-height:38px}
+.btn.icon svg{width:18px;height:18px}
+.viewnav{overflow-x:auto;scrollbar-width:none}.viewnav::-webkit-scrollbar{display:none}
+.viewnav button{white-space:nowrap}
+
+/* ---- tirar para recargar ---- */
+body{overscroll-behavior-y:contain}
+.ptr{position:fixed;left:50%;top:calc(6px + env(safe-area-inset-top,0px));transform:translate(-50%,-64px);z-index:30;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:7px 14px 7px 10px;font-size:.85rem;font-weight:700;display:flex;gap:8px;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.08);pointer-events:none;opacity:0}
+.ptr i{width:20px;height:20px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;transition:transform .15s}
+.ptr.ready i{transform:rotate(180deg)}
+.ptr.busy i{animation:spin .8s linear infinite}
+.ptr.busy i svg{display:none}.ptr.busy i::after{content:"";width:10px;height:10px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---- ficha de reserva ---- */
+.row .ficha{grid-column:1/-1}
+.ficha{background:var(--bg);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.fgrid div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:1px;min-width:0}
+.fgrid small{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.fgrid b{font-family:var(--f-display);font-size:1rem;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.fgrid span{font-size:.84rem;color:var(--muted)}
+.fh{font-family:var(--f-display);font-weight:700;font-size:.95rem;margin:2px 0 -2px}
+.ficha .rv-actions{margin-top:2px}
+.row.open{background:color-mix(in srgb,var(--accent-soft) 35%,var(--surface))}
+
+/* ---- calendario del dueño ---- */
+.wcd.free{background:transparent;box-shadow:inset 0 0 0 1px var(--line)}
+.wcd.gap{background:var(--wcd-gap);box-shadow:none}
+.wcd.free.past,.wcd.gap.past{box-shadow:none}
+.wcd.free.today,.wcd.gap.today{box-shadow:inset 0 0 0 2px var(--tile)}
+.wcd[data-ores],.wcd[data-ofree]{cursor:pointer}
+.wcd.sel{box-shadow:inset 0 0 0 2px var(--lav-ink)}
+.gaps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.gaps li{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+.gaps li:first-child{border-top:0}
+.gaps b{font-variant-numeric:tabular-nums}
+
+/* ---- desempeño ---- */
+.pf-tiles{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.pf-tiles .tile .v{font-size:1.45rem}
+.delta{font-size:.8rem;font-weight:700}
+.delta.up{color:var(--good)}.delta.down{color:var(--bad)}.delta.flat{color:var(--muted)}
+.chart{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 8px 6px}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart .g{stroke:var(--grid);stroke-width:1;shape-rendering:crispEdges}
+.chart .t{fill:var(--muted);font-family:var(--f-body);font-size:11px}
+.chart .vl{fill:var(--ink);font-family:var(--f-display);font-weight:700;font-size:11.5px}
+.chart .m{fill:var(--chart)}.chart .m.soft{fill:var(--chart-soft)}
+.chart .hb{fill:var(--ink);opacity:0}.chart .hit:hover+.hb,.chart .hit:focus+.hb,.chart .hb.on{opacity:.05}
+.chart .hit{fill:transparent;cursor:pointer;outline:none}
+.ctip{position:absolute;z-index:5;pointer-events:none;background:var(--ink);color:var(--bg);border-radius:10px;padding:7px 10px;font-size:.8rem;line-height:1.35;white-space:nowrap;transform:translate(-50%,-100%);box-shadow:0 4px 14px rgba(0,0,0,.12)}
+.ctip b{font-family:var(--f-display)}
+.csub2{font-size:.86rem;color:var(--muted);margin:-6px 0 10px}
+.ptable-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-top:10px}
+.ptable{border-collapse:collapse;width:100%;font-size:.86rem;font-variant-numeric:tabular-nums}
+.ptable th,.ptable td{padding:8px 10px;text-align:right;border-top:1px solid var(--line);white-space:nowrap}
+.ptable th{border-top:0;color:var(--muted);font-size:.72rem;letter-spacing:.05em;text-transform:uppercase}
+.ptable th:first-child,.ptable td:first-child{text-align:left}
+.ptable tr.fut td{color:var(--muted)}
+details.tv summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:.88rem;margin-top:10px}
+.pf-two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:640px){.pf-two{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
 .gate{position:fixed;inset:0;z-index:60;background:var(--bg);overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px}
@@ -415,6 +502,8 @@ textarea.copybox{width:100%;min-height:110px;font:inherit;font-size:.88rem;borde
 </script>
 
 
+<script>try{document.documentElement.setAttribute("data-theme",localStorage.getItem("libro_tema")==="dark"?"dark":"light");}catch(e){document.documentElement.setAttribute("data-theme","light");}</script>
+<div class="ptr" id="ptr" aria-hidden="true"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></i><span>Tirá para actualizar</span></div>
 <div class="wrap">
   <header class="top">
     <div>
@@ -423,10 +512,14 @@ textarea.copybox{width:100%;min-height:110px;font:inherit;font-size:.88rem;borde
       <div class="sub" id="sub">Cargando reservas…</div>
       <div class="sub" id="sync"></div>
     </div>
-    <button class="btn" id="refresh" type="button" data-action="refresh">Actualizar</button>
+    <div class="topbtns">
+      <button class="btn icon" id="theme" type="button" aria-label="Activar modo oscuro" title="Modo oscuro"></button>
+      <button class="btn" id="refresh" type="button" data-action="refresh">Actualizar</button>
+    </div>
   </header>
   <nav class="viewnav" id="viewnav" aria-label="Secciones" hidden>
-    <button type="button" data-view="main" aria-pressed="true">Reservas y reseñas</button>
+    <button type="button" data-view="main" aria-pressed="true">Reservas</button>
+    <button type="button" data-view="perf" aria-pressed="false">Desempeño</button>
     <button type="button" data-view="clean" aria-pressed="false">Limpieza</button>
   </nav>
   <div id="view-main" class="views" hidden>
@@ -455,6 +548,21 @@ textarea.copybox{width:100%;min-height:110px;font:inherit;font-size:.88rem;borde
     <div class="tiles" id="tiles"></div>
   </section>
 
+  <section aria-label="Calendario y noches libres">
+    <details class="wcal" id="ocal">
+      <summary><div><b>Calendario y noches libres</b><span id="ocal-sum">Cargando…</span></div><i class="chev" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></i></summary>
+      <div class="wcal-body">
+        <div class="wlegend"><span><i class="dot" style="--dot:var(--wcd-in);box-shadow:inset 0 0 0 1px var(--line)"></i>Llegada</span><span><i class="dot" style="--dot:var(--wcd-occ);box-shadow:inset 0 0 0 1px var(--line)"></i>Ocupada</span><span><i class="dot" style="--dot:transparent;box-shadow:inset 0 0 0 1px var(--muted)"></i>Libre</span><span><i class="dot" style="--dot:var(--wcd-gap);box-shadow:inset 0 0 0 1px var(--line)"></i>Hueco corto (1–2 noches)</span></div>
+        <div id="omonths"></div>
+        <div id="odet"></div>
+        <div>
+          <h3 class="fh" style="margin-bottom:8px">Noches libres para vender · próximos 90 días</h3>
+          <ul class="gaps" id="ogaps"></ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
   <section aria-labelledby="h-book">
     <div class="sec-head"><h2 id="h-book">Reservas</h2></div>
     <div class="controls">
@@ -470,6 +578,39 @@ textarea.copybox{width:100%;min-height:110px;font:inherit;font-size:.88rem;borde
   </section>
 
   <p class="foot">Las reservas (PriceLabs) y las reseñas, nombres, teléfonos y chats (Airbnb) los actualiza Claude todas las mañanas a las 9. Las compras y tareas se ven al instante. Los montos son el ingreso por alojamiento que informa PriceLabs, en USD. El equipo de limpieza usa su propia app instalable (esmeralda-vip.github.io/limpieza-retiro), que lee la misma planilla.</p>
+  </div>
+  <div id="view-perf" class="views" hidden>
+  <section aria-labelledby="h-perf">
+    <div class="sec-head"><h2 id="h-perf" style="font-size:1.45rem">Desempeño</h2><span class="muted" id="pf-src" style="font-size:.85rem"></span></div>
+    <div class="controls">
+      <div class="seg" id="pf-range" role="group" aria-label="Período">
+        <button type="button" data-pr="next30" aria-pressed="false">Próx. 30 días</button>
+        <button type="button" data-pr="last30" aria-pressed="false">Últ. 30 días</button>
+        <button type="button" data-pr="last90" aria-pressed="true">Últ. 90 días</button>
+        <button type="button" data-pr="last365" aria-pressed="false">Últ. 12 meses</button>
+      </div>
+    </div>
+    <div class="tiles pf-tiles" id="pf-tiles"><div class="empty skel" style="grid-column:1/-1">Cargando reservas…</div></div>
+  </section>
+  <section aria-labelledby="h-pf-rev">
+    <h2 id="h-pf-rev" style="margin-bottom:10px">Ingreso por mes</h2>
+    <p class="csub2">Ingreso por alojamiento en USD, repartido por noche. Las barras más claras son meses por venir con lo reservado hasta hoy.</p>
+    <div class="chart" id="pf-rev"></div>
+  </section>
+  <section aria-labelledby="h-pf-occ">
+    <h2 id="h-pf-occ" style="margin-bottom:10px">Ocupación por mes</h2>
+    <p class="csub2">Noches vendidas sobre noches disponibles.</p>
+    <div class="chart" id="pf-occ"></div>
+    <details class="tv"><summary>Ver la tabla mes por mes</summary><div class="ptable-wrap" id="pf-table"></div></details>
+  </section>
+  <section aria-labelledby="h-pf-how">
+    <h2 id="h-pf-how" style="margin-bottom:12px">Cómo reservan <span class="muted" style="font-size:.85rem;font-weight:400">· últimos 12 meses</span></h2>
+    <div class="pf-two">
+      <div class="card"><h3>Con cuánta anticipación</h3><div class="praise" id="pf-lead"></div></div>
+      <div class="card"><h3>Cuántas noches se quedan</h3><div class="praise" id="pf-los"></div></div>
+    </div>
+  </section>
+  <p class="foot">Todo sale de las reservas de PriceLabs (canceladas incluidas para la tasa de cancelación). Ocupación = noches vendidas / noches disponibles. Tarifa promedio = ingreso / noches vendidas. RevPAR = ingreso / noches disponibles. Las noches disponibles se cuentan desde la primera reserva registrada. La nota promedio usa las reseñas marcadas de las estadías que terminaron en el período.</p>
   </div>
   <div id="view-clean" class="views" hidden>
   <section aria-label="Limpieza">
@@ -626,7 +767,9 @@ textarea.copybox{width:100%;min-height:110px;font:inherit;font-size:.88rem;borde
         id: String(r.reservation_id), listing: String(r.listing_id), name: cleanName(r.listing_name),
         city: r.city || "", inD: inD, outD: outD, nights: Number(r.no_of_days) || (outD - inD),
         revenue: Number(r.rental_revenue) || 0, status: r.status === "cancelled" ? "cancelled" : "booked",
-        bookedD: r.booked_time ? Math.floor(Number(r.booked_time) / DAY) : null, lead: r.lead_time
+        bookedD: r.booked_time ? Math.floor(Number(r.booked_time) / DAY) : null, lead: r.lead_time,
+        adr: r.nightly_amount != null ? Number(r.nightly_amount) : null, extra: r.extra_charges != null ? Number(r.extra_charges) : null,
+        source: r.booking_source || "", cancelD: r.cancellation_time ? Math.floor(Number(r.cancellation_time) / DAY) : null
       });
     });
     out.sort(function(a, b){ return a.inD - b.inD; });
@@ -660,7 +803,7 @@ textarea.copybox{width:100%;min-height:110px;font:inherit;font-size:.88rem;borde
   var ONLY_LISTING = "1434292265638435339"; /* Encantador apart de época Retiro */
   var INPUT = {
     question: "Libro de Huéspedes: reservas de Airbnb para el panel de reseñas",
-    date_filters: { min_check_in_date: iso(TODAY - 150), max_check_in_date: iso(TODAY + 270) },
+    date_filters: { min_check_in_date: iso(TODAY - 400), max_check_in_date: iso(TODAY + 365) },
     filters: { booking_status: ["booked", "cancelled"], listings: [{ listing_id: ONLY_LISTING, pms_name: "airbnb" }] },
     limit: 500, offset: 0
   };
@@ -701,11 +844,12 @@ textarea.copybox{width:100%;min-height:110px;font:inherit;font-size:.88rem;borde
     }, { cache: { staleTime: 600000, gcTime: 604800000 }, refetchInterval: 1800000 });
   }
   function refresh(){
-    if (!S.mcp) return;
+    if (!S.mcp) return Promise.resolve();
     $("sub").textContent = "Actualizando…";
-    S.mcp.callTool(SERVER, TOOL, INPUT, { cache: { staleTime: 600000, gcTime: 604800000, refresh: true } })
+    return S.mcp.callTool(SERVER, TOOL, INPUT, { cache: { staleTime: 600000, gcTime: 604800000, refresh: true } })
       .then(function(res){ onData(res); }, function(err){ onError(err); });
   }
+  window.__libroRefresh = function(){ document.dispatchEvent(new CustomEvent("libro:refresh-compras")); return refresh(); };
 
   /* ---------- reseñas (db) ---------- */
   function startDb(db){
@@ -969,6 +1113,231 @@ textarea.copybox{width:100%;min-height:110px;font:inherit;font-size:.88rem;borde
       '<div class="tile"><span class="eyebrow">Tasa de reseñas</span><span class="v">' + (rate === null ? "—" : rate + "%") + '</span><span class="h">' + (closed ? got + " de " + closed + " estadías con la ventana cerrada (90 días)" : "Aún no hay ventanas cerradas") + '</span></div>';
   }
 
+  /* ---------- ficha de reserva ---------- */
+  function proxOf(r){ return (window.__prox && window.__prox[r.id]) || {}; }
+  function kv(label, val, sub){ return '<div><small>' + label + '</small><b>' + val + '</b>' + (sub ? '<span>' + sub + '</span>' : '') + '</div>'; }
+  function guestsOf(r){
+    var rv = rvOf(r), px = proxOf(r), n = Number(rv.guests || px.guests || 0) || null, parts = [];
+    if (rv.adults) parts.push(plural(Number(rv.adults), "adulto", "adultos"));
+    if (rv.children) parts.push(plural(Number(rv.children), "niño", "niños"));
+    if (rv.infants) parts.push(plural(Number(rv.infants), "bebé", "bebés"));
+    if (rv.pets) parts.push(plural(Number(rv.pets), "mascota", "mascotas"));
+    return { n: n, parts: parts };
+  }
+  function fichaHTML(r){
+    var rv = rvOf(r), px = proxOf(r), g = guestsOf(r);
+    var inT = rv.inTime || px.inTime || "", outT = rv.outTime || px.outTime || "";
+    var lead = r.lead != null && r.lead !== "" ? Number(r.lead) : (r.bookedD != null ? r.inD - r.bookedD : null);
+    var adr = r.adr != null ? r.adr : (r.nights ? r.revenue / r.nights : 0);
+    var h = '<div class="ficha">';
+    h += '<div class="fh">Estadía</div><div class="fgrid">' +
+      kv("Ingreso", fmt(r.inD, { weekday: "short", day: "numeric", month: "short" }), inT ? esc(inT) + " h" : "Horario a confirmar") +
+      kv("Salida", fmt(r.outD, { weekday: "short", day: "numeric", month: "short" }), outT ? esc(outT) + " h" : "Horario a confirmar") +
+      kv("Noches", String(r.nights)) +
+      kv("Huéspedes", g.n ? String(g.n) : "—", g.parts.length ? g.parts.join(" · ") : (g.n ? "" : "Se completa con la lectura de Airbnb")) + '</div>';
+    var who = [];
+    who.push(kv("Nombre", rv.guestName ? esc(rv.guestName) : "—"));
+    if (phoneOf(r)) who.push('<div><small>Teléfono</small><b class="mono" style="font-size:.9rem">' + esc(phoneOf(r)) + '</b><span><a class="link" href="https://wa.me/' + phoneOf(r).replace(/\D/g, "") + '" target="_blank" rel="noopener">WhatsApp ↗</a></span></div>');
+    if (rv.country) who.push(kv("País", esc(rv.country)));
+    if (rv.language) who.push(kv("Idioma", esc(rv.language)));
+    h += '<div class="fh">Huésped</div><div class="fgrid">' + who.join("") + '</div>';
+    h += '<div class="fh">Reserva y montos</div><div class="fgrid">' +
+      kv("Ingreso por alojamiento", r.status === "cancelled" ? "—" : money(r.revenue), r.status === "cancelled" ? "Cancelada" : "Según PriceLabs") +
+      kv("Por noche", r.status === "cancelled" ? "—" : money(adr)) +
+      (r.extra ? kv("Cargos extra", money(r.extra), "Limpieza y otros") : "") +
+      kv("Reservó", r.bookedD != null ? fmt(r.bookedD, { day: "numeric", month: "short", year: "numeric" }) : "—", lead != null && isFinite(lead) ? plural(lead, "día", "días") + " antes de llegar" : "") +
+      kv("Canal", esc(r.source || "Airbnb"), '<span class="mono">' + esc(r.id) + '</span>') +
+      (r.status === "cancelled" ? kv("Cancelada", r.cancelD != null ? fmt(r.cancelD, { day: "numeric", month: "short", year: "numeric" }) : "Sí") : "") + '</div>';
+    var notes = String(px.notes || "").split(/\s*\|\s*/).map(function(x){ return x.trim(); }).filter(Boolean);
+    if (notes.length) h += '<div class="wnotes"><small>Pedidos del huésped</small>' + notes.map(function(x){ return '<span>' + esc(x) + '</span>'; }).join("") + '</div>';
+    if (r.status !== "cancelled") h += chatHTML(r);
+    if (r.status !== "cancelled" && r.outD <= TODAY) h += statusHTML(r);
+    h += '<div class="rv-actions"><a class="btn small primary" href="https://www.airbnb.com.ar/hosting/stay/' + encodeURIComponent(r.id) + '" target="_blank" rel="noopener">Abrir en Airbnb ↗</a>' +
+      '<button class="btn small" type="button" data-action="ficha" data-id="' + esc(r.id) + '">Cerrar ficha</button></div>';
+    return h + '</div>';
+  }
+
+  /* ---------- calendario con noches libres ---------- */
+  var MES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  function freeRuns(booked, from, to){
+    var runs = [], n = from;
+    function occ(d){ for (var i = 0; i < booked.length; i++) if (booked[i].inD <= d && booked[i].outD > d) return booked[i]; return null; }
+    while (n < to) {
+      if (occ(n)) { n++; continue; }
+      var a = n; while (n < to && !occ(n)) n++;
+      var prev = null, next = null;
+      booked.forEach(function(r){ if (r.outD <= a && (!prev || r.outD > prev.outD)) prev = r; if (r.inD >= n && (!next || r.inD < next.inD)) next = r; });
+      runs.push({ a: a, b: n, len: n - a, prev: prev, next: next, bounded: !!(prev && next && prev.outD === a && next.inD === n) });
+    }
+    return runs;
+  }
+  function renderOwnerCal(){
+    if (!S.loaded) { $("ocal-sum").textContent = S.mcpState === "loading" ? "Cargando…" : "Sin datos de PriceLabs."; $("omonths").innerHTML = ""; $("ogaps").innerHTML = ""; $("odet").innerHTML = ""; return; }
+    var booked = S.res.filter(function(r){ return r.status === "booked"; });
+    var fut = booked.filter(function(r){ return r.outD > TODAY; });
+    var lastOut = fut.length ? Math.max.apply(null, fut.map(function(r){ return r.outD; })) : TODAY;
+    var y = dt(TODAY).getUTCFullYear(), m = dt(TODAY).getUTCMonth();
+    var endD = Math.max(lastOut, Math.round(Date.UTC(y, m + 3, 0) / DAY));
+    var runs = freeRuns(booked, TODAY, TODAY + 90);
+    var free90 = runs.reduce(function(s, x){ return s + x.len; }, 0), short = runs.filter(function(x){ return x.bounded && x.len <= 2; });
+    var free60 = freeRuns(booked, TODAY, TODAY + 60).reduce(function(s, x){ return s + x.len; }, 0);
+    $("ocal-sum").textContent = plural(free60, "noche libre", "noches libres") + " en los próximos 60 días" + (short.length ? " · " + plural(short.length, "hueco corto", "huecos cortos") : "");
+    var gapDay = {};
+    freeRuns(booked, TODAY, endD).forEach(function(x){ if (x.bounded && x.len <= 2) for (var d = x.a; d < x.b; d++) gapDay[d] = x; });
+    var dl = dt(endD), ly = dl.getUTCFullYear(), lm = dl.getUTCMonth(), html = "";
+    while (y < ly || (y === ly && m <= lm)) {
+      var first = Math.round(Date.UTC(y, m, 1) / DAY), days = new Date(Date.UTC(y, m + 1, 0)).getUTCDate(), lead = (dt(first).getUTCDay() + 6) % 7, g = "";
+      ["L","M","M","J","V","S","D"].forEach(function(w){ g += '<div class="wdh">' + w + '</div>'; });
+      for (var k = 0; k < lead; k++) g += '<div></div>';
+      for (var dd = 0; dd < days; dd++) {
+        var n = first + dd, cls = [], tag = "", hit = null;
+        for (var i = 0; i < booked.length; i++) { var r = booked[i]; if (r.inD <= n && r.outD > n) { hit = r; break; } }
+        if (hit) { cls.push(hit.inD === n ? "in" : "occ"); if (hit.inD === n) tag = (rvOf(hit).guestName || "llega").split(" ")[0]; }
+        else { cls.push(gapDay[n] ? "gap" : "free"); if (gapDay[n]) tag = "hueco"; else if (n >= TODAY) tag = "libre"; }
+        if (n < TODAY) cls.push("past");
+        if (n === TODAY) cls.push("today");
+        if (hit && S.calSel === hit.id) cls.push("sel");
+        if (!hit && S.calFree === n) cls.push("sel");
+        var lbl = fmt(n, { weekday: "short", day: "numeric", month: "short" }) + (hit ? ", " + (rvOf(hit).guestName || "reservada") : ", libre");
+        if (hit) g += '<button type="button" class="wcd ' + cls.join(" ") + '" data-ores="' + esc(hit.id) + '" aria-label="' + esc(lbl) + '">' + (dd + 1) + (tag ? '<small>' + esc(tag.slice(0, 8)) + '</small>' : '') + '</button>';
+        else if (n >= TODAY) g += '<button type="button" class="wcd ' + cls.join(" ") + '" data-ofree="' + n + '" aria-label="' + esc(lbl) + '">' + (dd + 1) + (tag ? '<small>' + tag + '</small>' : '') + '</button>';
+        else g += '<div class="wcd ' + cls.join(" ") + '">' + (dd + 1) + '</div>';
+      }
+      html += '<div class="wmonth"><h4>' + MES[m] + ' ' + y + '</h4><div class="wgrid">' + g + '</div></div>';
+      m++; if (m > 11) { m = 0; y++; }
+    }
+    $("omonths").innerHTML = html;
+    function nm(r){ return r ? (rvOf(r).guestName || "otra reserva").split(" ")[0] : ""; }
+    function runText(x){ return x.prev && x.next && x.bounded ? "entre " + esc(nm(x.prev)) + " y " + esc(nm(x.next)) : x.next && x.next.inD === x.b ? "antes de " + esc(nm(x.next)) : x.prev && x.prev.outD === x.a ? "después de " + esc(nm(x.prev)) : "sin reservas alrededor"; }
+    $("ogaps").innerHTML = runs.length ? runs.map(function(x){
+      return '<li><div class="si"><b>' + fmt(x.a, { weekday: "short", day: "numeric", month: "short" }) + ' → ' + fmt(x.b, { weekday: "short", day: "numeric", month: "short" }) + '</b><span>' + plural(x.len, "noche", "noches") + ' · ' + runText(x) + (x.b === TODAY + 90 ? ' (sigue)' : '') + '</span></div>' +
+        (x.bounded && x.len <= 2 ? '<span class="wpill butter">Hueco corto</span>' : x.a - TODAY <= 7 ? '<span class="wpill lav">Esta semana</span>' : '') + '</li>';
+    }).join("") : '<li class="muted">No hay noches libres en los próximos 90 días.</li>';
+    var det = "";
+    if (S.calSel) { var sr = findRes(S.calSel); if (sr) det = '<div class="fh" style="margin-bottom:8px">' + (rvOf(sr).guestName ? esc(rvOf(sr).guestName) : "Reserva " + esc(sr.id)) + '</div>' + fichaHTML(sr).replace('data-action="ficha"', 'data-action="cal-close"').replace("Cerrar ficha", "Cerrar"); }
+    else if (S.calFree != null) {
+      var fr = freeRuns(booked, TODAY, endD + 1).filter(function(x){ return x.a <= S.calFree && x.b > S.calFree; })[0];
+      if (fr) det = '<div class="ficha"><div class="fh">Libre: ' + fmt(fr.a, { weekday: "short", day: "numeric", month: "short" }) + ' → ' + fmt(fr.b, { weekday: "short", day: "numeric", month: "short" }) + '</div><div class="muted" style="font-size:.9rem">' + plural(fr.len, "noche", "noches") + ' · ' + runText(fr) + (fr.bounded && fr.len <= 2 ? '. Es un hueco corto: suele venderse mejor con una estadía mínima más baja o un precio de último momento.' : '.') + '</div><div class="rv-actions"><a class="btn small primary" href="https://www.airbnb.com.ar/multicalendar" target="_blank" rel="noopener">Abrir calendario de Airbnb ↗</a><button class="btn small" type="button" data-action="cal-close">Cerrar</button></div></div>';
+    }
+    $("odet").innerHTML = det;
+  }
+
+  /* ---------- desempeño ---------- */
+  S.pr = "last90";
+  function overlap(r, a, b){ return Math.max(0, Math.min(r.outD, b) - Math.max(r.inD, a)); }
+  function stats(a, b){
+    var booked = S.res.filter(function(r){ return r.status === "booked"; });
+    var firstD = S.res.length ? Math.min.apply(null, S.res.map(function(r){ return r.inD; })) : a;
+    var a2 = Math.max(a, firstD), avail = Math.max(0, b - a2) * Math.max(1, S.listings.length);
+    var nights = 0, rev = 0, arr = [], canc = 0, all = 0, ratings = [];
+    booked.forEach(function(r){ var o = overlap(r, a2, b); if (o) { nights += o; rev += r.revenue * o / Math.max(1, r.outD - r.inD); } });
+    S.res.forEach(function(r){
+      if (r.inD < a2 || r.inD >= b) return;
+      all++; if (r.status === "cancelled") { canc++; return; }
+      arr.push(r);
+    });
+    booked.forEach(function(r){ if (r.outD > a2 && r.outD <= b && r.outD <= TODAY) { var rv = S.reviews[r.id]; if (rv && rv.guestReviewed && rv.rating) ratings.push(Number(rv.rating)); } });
+    function avg(xs){ return xs.length ? xs.reduce(function(s, v){ return s + v; }, 0) / xs.length : null; }
+    var leads = arr.map(function(r){ return r.lead != null && r.lead !== "" ? Number(r.lead) : (r.bookedD != null ? r.inD - r.bookedD : null); }).filter(function(v){ return v != null && isFinite(v); });
+    return { a: a2, b: b, avail: avail, nights: nights, rev: rev, occ: avail ? nights / avail : null, adr: nights ? rev / nights : null, revpar: avail ? rev / avail : null,
+      count: arr.length, los: avg(arr.map(function(r){ return r.nights; })), lead: avg(leads), cancel: all ? canc / all : null, canc: canc, all: all, rating: avg(ratings), nRatings: ratings.length, firstD: firstD };
+  }
+  function pct(v){ return v == null ? "—" : Math.round(v * 100) + "%"; }
+  function deltaHTML(cur, prev, kind){
+    if (cur == null || prev == null || !isFinite(cur) || !isFinite(prev)) return "";
+    var d = kind === "pp" ? Math.round((cur - prev) * 100) : (prev ? Math.round((cur - prev) / prev * 100) : null);
+    if (d == null) return "";
+    var c = d > 0 ? "up" : d < 0 ? "down" : "flat";
+    return '<span class="delta ' + c + '">' + (d > 0 ? "▲ +" : d < 0 ? "▼ −" : "= ") + (d === 0 ? "" : Math.abs(d)) + (kind === "pp" ? (d === 0 ? "igual" : " pts") : (d === 0 ? "igual" : "%")) + ' vs. anterior</span>';
+  }
+  function niceMax(v){ if (!(v > 0)) return 1; var e = Math.pow(10, Math.floor(Math.log10(v))), f = v / e; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * e; }
+  function compact(v){ return v >= 10000 ? Math.round(v / 1000) + "K" : Math.round(v).toLocaleString("es-AR"); }
+  function colChart(el, pts, o){
+    var W = Math.max(280, el.clientWidth - 16), H = 210, pl = 44, pr = 6, pt = 20, pb = 24, iw = W - pl - pr, ih = H - pt - pb;
+    var n = pts.length, slot = iw / Math.max(1, n), bw = Math.min(24, Math.max(6, slot * 0.62));
+    var mx = o.max || niceMax(Math.max.apply(null, pts.map(function(p){ return p.v; }).concat([0])));
+    var steps = 4, svg = '';
+    for (var i = 0; i <= steps; i++) { var yv = mx * i / steps, yy = pt + ih - ih * i / steps; svg += '<line class="g" x1="' + pl + '" x2="' + (W - pr) + '" y1="' + yy.toFixed(1) + '" y2="' + yy.toFixed(1) + '"/><text class="t" x="' + (pl - 6) + '" y="' + (yy + 4).toFixed(1) + '" text-anchor="end">' + o.tick(yv) + '</text>'; }
+    var every = slot < 34 ? 2 : 1, hi = -1, hv = -1;
+    pts.forEach(function(p, k){ if (!p.soft && p.v > hv) { hv = p.v; hi = k; } });
+    pts.forEach(function(p, k){
+      var cx = pl + slot * k + slot / 2, h = mx ? ih * Math.min(p.v, mx) / mx : 0, x = cx - bw / 2, y0 = pt + ih, y = y0 - h, rr = Math.min(4, h, bw / 2);
+      if (h > 0.5) svg += '<path class="m' + (p.soft ? " soft" : "") + '" d="M' + x.toFixed(1) + ' ' + y0 + 'V' + (y + rr).toFixed(1) + 'Q' + x.toFixed(1) + ' ' + y.toFixed(1) + ' ' + (x + rr).toFixed(1) + ' ' + y.toFixed(1) + 'H' + (x + bw - rr).toFixed(1) + 'Q' + (x + bw).toFixed(1) + ' ' + y.toFixed(1) + ' ' + (x + bw).toFixed(1) + ' ' + (y + rr).toFixed(1) + 'V' + y0 + 'Z"/>';
+      if ((k === hi || p.cur) && p.v > 0) svg += '<text class="vl" x="' + cx.toFixed(1) + '" y="' + (y - 5).toFixed(1) + '" text-anchor="middle">' + o.lbl(p.v) + '</text>';
+      if ((n - 1 - k) % every === 0) svg += '<text class="t" x="' + cx.toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle"' + (p.cur ? ' style="font-weight:700;fill:var(--ink)"' : '') + '>' + p.label + '</text>';
+      svg += '<rect class="hit" data-k="' + k + '" tabindex="0" role="img" aria-label="' + esc(p.aria) + '" x="' + (pl + slot * k).toFixed(1) + '" y="' + pt + '" width="' + slot.toFixed(1) + '" height="' + ih + '"/><rect class="hb" x="' + (pl + slot * k + 1).toFixed(1) + '" y="' + pt + '" width="' + Math.max(0, slot - 2).toFixed(1) + '" height="' + ih + '" pointer-events="none"/>';
+    });
+    el.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" aria-label="' + esc(o.title) + '">' + svg + '</svg><div class="ctip" hidden></div>';
+    el._pts = pts;
+  }
+  function chartTip(e){
+    var hit = e.target.closest && e.target.closest(".chart .hit"), el = e.target.closest && e.target.closest(".chart");
+    Array.prototype.forEach.call(document.querySelectorAll(".chart .ctip"), function(t){ if (!el || t.parentNode !== el) t.hidden = true; });
+    if (!el) return;
+    var tip = el.querySelector(".ctip");
+    if (!hit) { tip.hidden = true; return; }
+    var p = el._pts[Number(hit.getAttribute("data-k"))], r = hit.getBoundingClientRect(), er = el.getBoundingClientRect();
+    tip.innerHTML = p.tip; tip.hidden = false;
+    var x = r.left - er.left + r.width / 2, w = tip.offsetWidth;
+    x = Math.max(w / 2 + 4, Math.min(er.width - w / 2 - 4, x));
+    tip.style.left = x + "px"; tip.style.top = (r.top - er.top + 4) + "px";
+  }
+  ["pointerover", "pointerdown", "focusin"].forEach(function(ev){ document.addEventListener(ev, chartTip); });
+  document.addEventListener("pointerout", function(e){ if (e.pointerType === "mouse" && e.target.closest && e.target.closest(".chart .hit") && !(e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest(".chart .hit"))) { var t = e.target.closest(".chart").querySelector(".ctip"); if (t) t.hidden = true; } });
+  document.addEventListener("focusout", function(e){ if (e.target.closest && e.target.closest(".chart .hit")) { var t = e.target.closest(".chart").querySelector(".ctip"); if (t) t.hidden = true; } });
+  function bucketRows(el, list, buckets){
+    var tot = list.length, cnt = buckets.map(function(b){ return list.filter(b.f).length; }), mx = Math.max.apply(null, cnt.concat([1]));
+    el.innerHTML = tot ? buckets.map(function(b, i){ return '<div class="prow"><span class="t">' + b.l + '</span><span class="c">' + cnt[i] + ' · ' + Math.round(100 * cnt[i] / tot) + '%</span><div class="cbar"><span style="width:' + Math.round(100 * cnt[i] / mx) + '%"></span></div></div>'; }).join("") : '<span class="muted">Sin reservas en el período.</span>';
+  }
+  function renderPerf(){
+    if ($("view-perf").hidden) return;
+    Array.prototype.forEach.call($("pf-range").querySelectorAll("button"), function(b){ b.setAttribute("aria-pressed", String(b.getAttribute("data-pr") === S.pr)); });
+    if (!S.loaded) { $("pf-tiles").innerHTML = '<div class="empty skel" style="grid-column:1/-1">' + (S.mcpState === "loading" ? "Cargando reservas…" : "Sin datos de PriceLabs todavía.") + '</div>'; $("pf-rev").innerHTML = ""; $("pf-occ").innerHTML = ""; return; }
+    var R = { next30: [TODAY, TODAY + 30], last30: [TODAY - 30, TODAY], last90: [TODAY - 90, TODAY], last365: [TODAY - 365, TODAY] }[S.pr];
+    var st = stats(R[0], R[1]), len = R[1] - R[0];
+    var prev = stats(R[0] - len, R[0]);
+    var prevOk = S.pr !== "next30" && prev.a === R[0] - len && prev.avail > 0;
+    function dl(c, p, k){ return prevOk ? deltaHTML(c, p, k) : ""; }
+    $("pf-src").textContent = "PriceLabs · USD · " + fmt(st.a, { day: "numeric", month: "short", year: "numeric" }) + " → " + fmt(R[1] - 1, { day: "numeric", month: "short", year: "numeric" });
+    $("pf-tiles").innerHTML =
+      '<div class="tile"><span class="eyebrow">Ocupación</span><span class="v">' + pct(st.occ) + '</span><span class="h">' + plural(st.nights, "noche vendida", "noches vendidas") + ' de ' + st.avail + '</span>' + dl(st.occ, prev.occ, "pp") + '<div class="bar"><span style="width:' + Math.round(100 * (st.occ || 0)) + '%"></span></div></div>' +
+      '<div class="tile"><span class="eyebrow">Ingreso</span><span class="v">' + money(st.rev) + '</span><span class="h">Por alojamiento</span>' + dl(st.rev, prev.rev) + '</div>' +
+      '<div class="tile"><span class="eyebrow">Tarifa promedio</span><span class="v">' + (st.adr == null ? "—" : money(st.adr)) + '</span><span class="h">Por noche vendida (ADR)</span>' + dl(st.adr, prev.adr) + '</div>' +
+      '<div class="tile"><span class="eyebrow">RevPAR</span><span class="v">' + (st.revpar == null ? "—" : money(st.revpar)) + '</span><span class="h">Ingreso por noche disponible</span>' + dl(st.revpar, prev.revpar) + '</div>' +
+      '<div class="tile"><span class="eyebrow">Reservas</span><span class="v">' + st.count + '</span><span class="h">' + (st.los ? "Estadía promedio " + st.los.toFixed(1).replace(".", ",") + " noches" : "Con llegada en el período") + '</span></div>' +
+      '<div class="tile"><span class="eyebrow">Anticipación</span><span class="v">' + (st.lead == null ? "—" : Math.round(st.lead) + " días") + '</span><span class="h">Promedio entre la reserva y la llegada</span></div>' +
+      '<div class="tile"><span class="eyebrow">Cancelaciones</span><span class="v">' + pct(st.cancel) + '</span><span class="h">' + (st.all ? st.canc + " de " + plural(st.all, "reserva", "reservas") : "Sin reservas en el período") + '</span></div>' +
+      '<div class="tile"><span class="eyebrow">Nota promedio</span><span class="v">' + (st.rating ? st.rating.toFixed(2).replace(".", ",") + " ★" : "—") + '</span><span class="h">' + (st.nRatings ? "De " + plural(st.nRatings, "reseña", "reseñas") : S.pr === "next30" ? "Todavía no hay estadías terminadas" : "Sin reseñas marcadas") + '</span></div>';
+    /* meses */
+    var cy = dt(TODAY).getUTCFullYear(), cm = dt(TODAY).getUTCMonth(), months = [];
+    var firstM = (function(){ var d = dt(st.firstD); return d.getUTCFullYear() * 12 + d.getUTCMonth(); })();
+    for (var k = -11; k <= 2; k++) {
+      var mi = cy * 12 + cm + k; if (mi < firstM) continue;
+      var yy = Math.floor(mi / 12), mm = mi % 12, a = Math.round(Date.UTC(yy, mm, 1) / DAY), b = Math.round(Date.UTC(yy, mm + 1, 1) / DAY), ms = stats(a, b);
+      var nIn = S.res.filter(function(r){ return r.status === "booked" && r.inD >= a && r.inD < b; }).length;
+      months.push({ y: yy, m: mm, a: a, b: b, s: ms, nIn: nIn, fut: a > TODAY, cur: a <= TODAY && b > TODAY });
+    }
+    function mlab(x){ return MES[x.m].slice(0, 3) + (x.m === 0 || x === months[0] ? " " + String(x.y).slice(2) : ""); }
+    function mfull(x){ return MES[x.m] + " " + x.y; }
+    colChart($("pf-rev"), months.map(function(x){ return { v: x.s.rev, soft: x.fut, cur: x.cur, label: mlab(x), aria: mfull(x) + ": " + money(x.s.rev),
+      tip: '<b>' + mfull(x) + '</b>' + (x.fut ? ' · reservado hasta hoy' : x.cur ? ' · en curso' : '') + '<br>Ingreso ' + money(x.s.rev) + '<br>Tarifa prom. ' + (x.s.adr == null ? "—" : money(x.s.adr)) + ' · ' + plural(x.s.nights, "noche", "noches") }; }),
+      { title: "Ingreso por mes", tick: function(v){ return "$" + compact(v); }, lbl: function(v){ return "$" + compact(v); } });
+    colChart($("pf-occ"), months.map(function(x){ return { v: (x.s.occ || 0) * 100, soft: x.fut, cur: x.cur, label: mlab(x), aria: mfull(x) + ": " + pct(x.s.occ),
+      tip: '<b>' + mfull(x) + '</b>' + (x.fut ? ' · reservado hasta hoy' : x.cur ? ' · en curso' : '') + '<br>Ocupación ' + pct(x.s.occ) + '<br>' + x.s.nights + ' de ' + x.s.avail + ' noches' }; }),
+      { title: "Ocupación por mes", max: 100, tick: function(v){ return Math.round(v) + "%"; }, lbl: function(v){ return Math.round(v) + "%"; } });
+    $("pf-table").innerHTML = '<table class="ptable"><thead><tr><th>Mes</th><th>Ocupación</th><th>Noches</th><th>Tarifa prom.</th><th>Ingreso</th><th>RevPAR</th><th>Llegadas</th></tr></thead><tbody>' +
+      months.slice().reverse().map(function(x){ return '<tr' + (x.fut ? ' class="fut"' : '') + '><td>' + mfull(x) + (x.fut ? ' · por venir' : x.cur ? ' · en curso' : '') + '</td><td>' + pct(x.s.occ) + '</td><td>' + x.s.nights + '/' + x.s.avail + '</td><td>' + (x.s.adr == null ? "—" : money(x.s.adr)) + '</td><td>' + money(x.s.rev) + '</td><td>' + (x.s.revpar == null ? "—" : money(x.s.revpar)) + '</td><td>' + x.nIn + '</td></tr>'; }).join("") + '</tbody></table>';
+    var yr = S.res.filter(function(r){ return r.status === "booked" && r.inD >= TODAY - 365 && r.inD < TODAY + 365 && (r.bookedD == null || r.bookedD >= TODAY - 365); });
+    function ld(r){ return r.lead != null && r.lead !== "" ? Number(r.lead) : (r.bookedD != null ? r.inD - r.bookedD : -1); }
+    bucketRows($("pf-lead"), yr.filter(function(r){ return ld(r) >= 0; }), [
+      { l: "Hasta 7 días", f: function(r){ return ld(r) <= 7; } }, { l: "8 a 30 días", f: function(r){ return ld(r) > 7 && ld(r) <= 30; } },
+      { l: "31 a 90 días", f: function(r){ return ld(r) > 30 && ld(r) <= 90; } }, { l: "Más de 90 días", f: function(r){ return ld(r) > 90; } }]);
+    bucketRows($("pf-los"), yr, [
+      { l: "1 a 2 noches", f: function(r){ return r.nights <= 2; } }, { l: "3 noches", f: function(r){ return r.nights === 3; } },
+      { l: "4 a 6 noches", f: function(r){ return r.nights >= 4 && r.nights <= 6; } }, { l: "7 noches o más", f: function(r){ return r.nights >= 7; } }]);
+  }
+  var rsz; window.addEventListener("resize", function(){ clearTimeout(rsz); rsz = setTimeout(renderPerf, 150); });
+
   function renderBook(){
     Array.prototype.forEach.call($("tabs").querySelectorAll("button"), function(b){ b.setAttribute("aria-pressed", String(b.getAttribute("data-tab") === S.tab)); });
     var chips = '<button type="button" data-prop="all" aria-pressed="' + (S.prop === "all") + '">Todos</button>' +
@@ -995,15 +1364,18 @@ textarea.copybox{width:100%;min-height:110px;font:inherit;font-size:.88rem;borde
       else if (st.k === "stay") pill = '<span class="pill stay">Alojado</span>';
       else pill = '<span class="muted" style="font-size:.82rem">en ' + plural(r.inD - TODAY, "día", "días") + '</span>';
       var canRate = false;
-      return '<div class="row' + (st.k === "cancelled" ? " cancel" : "") + '">' +
+      var open = S.ficha === r.id;
+      return '<div class="row' + (st.k === "cancelled" ? " cancel" : "") + (open ? " open" : "") + '">' +
         '<div class="cal"><div class="d">' + dt(r.inD).getUTCDate() + '</div><div class="m">' + fmt(r.inD, { month: "short" }) + '</div></div>' +
         '<div class="row-main"><div class="l1">' + (S.nameEdit === r.id && S.nameFrom === "row" ? guestHTML(r, "row") : (rvOf(r).guestName ? esc(rvOf(r).guestName) : '<span class="muted" style="font-weight:600">Huésped sin nombre</span>') + (r.status === "cancelled" ? "" : ' <button class="link" type="button" data-action="name-edit" data-from="row" data-id="' + esc(r.id) + '"' + (S.db ? "" : " disabled") + '>' + (rvOf(r).guestName ? "editar" : "+ nombre") + '</button>')) + '</div>' +
         '<div class="l2"><span class="dot" style="--dot:' + l.color + ';display:inline-block;width:8px;height:8px;margin-right:6px"></span>' + esc(l.label) + ' · <span class="mono">' + esc(r.id) + '</span></div>' +
         (phoneOf(r) ? '<div class="l2">' + phoneLine(r) + '</div>' : '') +
         '<div class="l2">' + fmt(r.inD) + ' → ' + fmt(r.outD) + ' · ' + plural(r.nights, "noche", "noches") + (r.bookedD != null ? ' · reservó el ' + fmt(r.bookedD) : "") + '</div>' + (r.status === "cancelled" ? "" : chatHTML(r)) + '</div>' +
         '<div class="row-side"><span class="money">' + (r.status === "cancelled" ? "—" : money(r.revenue)) + '</span>' + pill +
-        (canRate ? '<button class="btn small" type="button" data-action="rate-open" data-from="row" data-id="' + esc(r.id) + '">' + (st.k === "received" ? "Cambiar su nota" : "Registrar su reseña") + '</button>' : "") + '</div>' +
+        (canRate ? '<button class="btn small" type="button" data-action="rate-open" data-from="row" data-id="' + esc(r.id) + '">' + (st.k === "received" ? "Cambiar su nota" : "Registrar su reseña") + '</button>' : "") +
+        '<button class="btn small" type="button" data-action="ficha" data-id="' + esc(r.id) + '" aria-expanded="' + open + '">' + (open ? "Cerrar ficha" : "Ver ficha") + '</button></div>' +
         (S.rateOpen === r.id && S.rateFrom === "row" ? rateUI(r.id) : "") +
+        (open ? fichaHTML(r) : "") +
         '</div>';
     }).join("") + '</div>';
   }
@@ -1020,7 +1392,7 @@ textarea.copybox{width:100%;min-height:110px;font:inherit;font-size:.88rem;borde
     $("refresh").disabled = !S.mcp;
     var hadFocus = document.activeElement && document.activeElement.id === "gname";
     var caret = hadFocus ? document.activeElement.selectionStart : null;
-    renderBanners(); renderToday(); renderReviews(); renderTiles(); renderBook();
+    renderBanners(); renderToday(); renderReviews(); renderTiles(); renderOwnerCal(); renderBook(); renderPerf();
     var gi = $("gname");
     if (gi && (hadFocus || S.focusName)) { gi.focus(); var pos = caret == null ? gi.value.length : caret; try { gi.setSelectionRange(pos, pos); } catch (e) {} S.focusName = false; }
     if (S.copyFallback) selectFallback();
@@ -1030,8 +1402,11 @@ textarea.copybox{width:100%;min-height:110px;font:inherit;font-size:.88rem;borde
   function rvOf(r){ return S.reviews[r.id] || {}; }
   function findRes(id){ for (var i = 0; i < S.res.length; i++) if (S.res[i].id === id) return S.res[i]; return null; }
   document.addEventListener("click", function(e){
-    var t = e.target.closest("[data-action],[data-tab],[data-prop],[data-rvprop],[data-rvview]");
+    var t = e.target.closest("[data-action],[data-tab],[data-prop],[data-rvprop],[data-rvview],[data-ores],[data-ofree],[data-pr]");
     if (!t) return;
+    if (t.hasAttribute("data-pr")) { S.pr = t.getAttribute("data-pr"); renderPerf(); return; }
+    if (t.hasAttribute("data-ores")) { var oid = t.getAttribute("data-ores"); S.calSel = S.calSel === oid ? null : oid; S.calFree = null; renderOwnerCal(); if (S.calSel) $("odet").scrollIntoView({ behavior: "smooth", block: "nearest" }); return; }
+    if (t.hasAttribute("data-ofree")) { var fd = Number(t.getAttribute("data-ofree")); S.calFree = S.calFree === fd ? null : fd; S.calSel = null; renderOwnerCal(); if (S.calFree != null) $("odet").scrollIntoView({ behavior: "smooth", block: "nearest" }); return; }
     if (t.hasAttribute("data-tab")) { S.tab = t.getAttribute("data-tab"); S.rateOpen = null; render(); return; }
     if (t.hasAttribute("data-prop")) { S.prop = t.getAttribute("data-prop"); render(); return; }
     if (t.hasAttribute("data-rvprop")) { S.rvProp = t.getAttribute("data-rvprop"); S.rateOpen = null; S.nameEdit = null; render(); return; }
@@ -1051,7 +1426,10 @@ textarea.copybox{width:100%;min-height:110px;font:inherit;font-size:.88rem;borde
     else if (a === "copy-close") { S.copyFallback = null; render(); }
     else if (a === "name-edit") { S.nameEdit = id; S.nameFrom = t.getAttribute("data-from"); S.nameDraft = (S.reviews[id] || {}).guestName || ""; S.focusName = true; render(); }
     else if (a === "name-cancel") { S.nameEdit = null; render(); }
+    else if (a === "ficha") { S.ficha = S.ficha === id ? null : id; renderBook(); }
+    else if (a === "cal-close") { S.calSel = null; S.calFree = null; renderOwnerCal(); }
   });
+  document.addEventListener("libro:prox", function(){ renderBook(); renderOwnerCal(); });
   document.addEventListener("submit", function(e){
     var f = e.target.closest("form.name-form");
     if (!f) return;
@@ -1066,11 +1444,14 @@ textarea.copybox{width:100%;min-height:110px;font:inherit;font-size:.88rem;borde
 
   /* ---------- secciones ---------- */
   S.full = null;
-  S.view = location.hash === "#limpieza" ? "clean" : "main";
+  function hashView(){ return location.hash === "#limpieza" ? "clean" : location.hash === "#desempeno" ? "perf" : "main"; }
+  S.view = hashView();
   function applyView(){
     var v = S.full ? S.view : "clean";
     $("view-main").hidden = S.full === null || v !== "main";
+    $("view-perf").hidden = S.full === null || v !== "perf";
     $("view-clean").hidden = S.full === null || v !== "clean";
+    if (v === "perf") renderPerf();
     $("viewnav").hidden = !S.full;
     Array.prototype.forEach.call(document.querySelectorAll("[data-view]"), function(b){ b.setAttribute("aria-pressed", String(b.getAttribute("data-view") === v)); });
     $("refresh").hidden = !S.full;
@@ -1080,10 +1461,10 @@ textarea.copybox{width:100%;min-height:110px;font:inherit;font-size:.88rem;borde
   document.addEventListener("click", function(e){
     var b = e.target.closest("[data-view]"); if (!b) return;
     S.view = b.getAttribute("data-view");
-    try { history.replaceState(null, "", S.view === "clean" ? "#limpieza" : "#reservas"); } catch (err) {}
+    try { history.replaceState(null, "", S.view === "clean" ? "#limpieza" : S.view === "perf" ? "#desempeno" : "#reservas"); } catch (err) {}
     applyView(); window.scrollTo(0, 0);
   });
-  window.addEventListener("hashchange", function(){ S.view = location.hash === "#limpieza" ? "clean" : "main"; applyView(); });
+  window.addEventListener("hashchange", function(){ S.view = hashView(); applyView(); });
 
   /* ---------- arranque ---------- */
   render(); applyView();
@@ -1461,6 +1842,9 @@ textarea.copybox{width:100%;min-height:110px;font:inherit;font-size:.88rem;borde
       var opt = { cache: { staleTime: 30000, gcTime: 86400000 }, refetchInterval: 60000 };
       mcp.watchTool("Google Sheets", "get_values", { spreadsheetId: SHEET, range: "Proximas!A1:H300" }, function(ev){
         if (ev.type !== "data") { if (!W.up) $("w-now").innerHTML = '<div class="empty">' + errMsg(ev) + "</div>"; return; }
+        var px = {};
+        rows(ev.result && ev.result.payload).forEach(function(r){ px[String(r[0])] = { guests: r[4] ? Number(r[4]) : null, inTime: String(r[5] || "").trim(), outTime: String(r[6] || "").trim(), notes: String(r[7] || "") }; });
+        window.__prox = px; document.dispatchEvent(new CustomEvent("libro:prox"));
         W.up = rows(ev.result && ev.result.payload).map(function(r){
           var a = iso10(r[2]), b = iso10(r[3]);
           return { first: String(r[1] || "Huésped"), a: dnum(a), b: dnum(b), guests: r[4] ? Number(r[4]) : null, inTime: String(r[5] || "").trim(), outTime: String(r[6] || "").trim(), notes: String(r[7] || "") };
@@ -1520,7 +1904,56 @@ textarea.copybox{width:100%;min-height:110px;font:inherit;font-size:.88rem;borde
   renderSemana();
 })();
 </script>
+<script>
+/* ---- Modo oscuro opcional y tirar para recargar ---- */
+(function(){
+  "use strict";
+  var MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+  var SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+  var root = document.documentElement, btn = document.getElementById("theme");
+  function paint(){
+    var dark = root.getAttribute("data-theme") === "dark";
+    btn.innerHTML = dark ? SUN : MOON;
+    btn.setAttribute("aria-label", dark ? "Volver al modo claro" : "Activar modo oscuro"); btn.title = dark ? "Modo claro" : "Modo oscuro";
+    var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute("content", dark ? "#14171C" : "#F7F5F1");
+  }
+  btn.addEventListener("click", function(){
+    var t = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    root.setAttribute("data-theme", t);
+    try { localStorage.setItem("libro_tema", t); } catch (e) {}
+    paint();
+  });
+  paint();
 
+  var ptr = document.getElementById("ptr"), lab = ptr.querySelector("span"), y0 = null, pull = 0, busy = false, TH = 70;
+  function show(px){ ptr.style.transform = "translate(-50%," + (px - 64) + "px)"; ptr.style.opacity = String(Math.min(1, px / 40)); }
+  function hide(){ ptr.style.transition = "transform .2s, opacity .2s"; show(0); setTimeout(function(){ ptr.style.transition = ""; ptr.classList.remove("ready", "busy"); }, 220); }
+  function blocked(t){ return !t || (t.closest && t.closest("input,textarea,select,.gate,.inst,.chart,[contenteditable]")) || document.querySelector(".gate:not([hidden]),.inst:not([hidden])"); }
+  window.addEventListener("touchstart", function(e){
+    if (busy || e.touches.length !== 1 || (window.scrollY || document.documentElement.scrollTop) > 0 || blocked(e.target)) { y0 = null; return; }
+    y0 = e.touches[0].clientY; pull = 0;
+  }, { passive: true });
+  window.addEventListener("touchmove", function(e){
+    if (y0 === null) return;
+    if ((window.scrollY || document.documentElement.scrollTop) > 0) { y0 = null; show(0); return; }
+    pull = Math.max(0, (e.touches[0].clientY - y0) * 0.5);
+    if (pull < 6) return;
+    show(Math.min(pull, 96));
+    var ready = pull >= TH; ptr.classList.toggle("ready", ready); lab.textContent = ready ? "Soltá para actualizar" : "Tirá para actualizar";
+  }, { passive: true });
+  window.addEventListener("touchend", function(){
+    if (y0 === null) return;
+    y0 = null;
+    if (pull < TH) { hide(); return; }
+    busy = true; ptr.classList.remove("ready"); ptr.classList.add("busy"); lab.textContent = "Actualizando…"; show(64);
+    var t0 = Date.now(), p;
+    try { p = window.__libroRefresh ? window.__libroRefresh() : null; } catch (e) { p = null; }
+    Promise.resolve(p).catch(function(){}).then(function(){
+      setTimeout(function(){ lab.textContent = "Listo"; setTimeout(function(){ busy = false; hide(); }, 450); }, Math.max(0, 700 - (Date.now() - t0)));
+    });
+  });
+})();
+</script>
 <script>
 /* ---- Clave de acceso e instalación ---- */
 (function(){
