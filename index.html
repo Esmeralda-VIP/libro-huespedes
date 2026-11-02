@@ -331,6 +331,23 @@ body{overscroll-behavior-y:contain}
 details.tv summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:.88rem;margin-top:10px}
 .pf-two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media (max-width:640px){.pf-two{grid-template-columns:1fr}}
+/* ---- próximas reservas (limpieza) ---- */
+.nlist{display:flex;flex-direction:column;gap:10px}
+.nitem{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.nitem.open{border-color:var(--lav-ink)}
+.nhead{all:unset;box-sizing:border-box;width:100%;cursor:pointer;display:grid;grid-template-columns:48px minmax(0,1fr) auto 30px;gap:12px;align-items:center;padding:12px 14px;min-height:64px}
+.nhead:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:16px}
+.ndate{background:var(--lav);color:var(--lav-ink);border-radius:12px;text-align:center;padding:5px 0;line-height:1.05;display:flex;flex-direction:column}
+.ndate b{font-family:var(--f-display);font-size:1.25rem}.ndate small{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.nmain{display:flex;flex-direction:column;min-width:0}
+.nmain b{font-family:var(--f-display);font-size:1.08rem;color:var(--ink)}
+.nmain span{font-size:.84rem;color:var(--muted)}
+.nside{display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+.nhead .chev{width:30px;height:30px}
+.nitem.open .chev{transform:rotate(180deg)}
+.nbody{padding:0 10px 10px}
+.nbody .wres{box-shadow:none}
+@media (max-width:420px){.nhead{grid-template-columns:44px minmax(0,1fr) 28px;row-gap:6px}.ndate{grid-row:1/3}.nside{grid-column:2;grid-row:2;flex-direction:row;justify-content:flex-start}.nhead .chev{grid-column:3;grid-row:1/3}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
 .gate{position:fixed;inset:0;z-index:60;background:var(--bg);overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px}
@@ -504,6 +521,8 @@ details.tv summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:
 
 <script>try{document.documentElement.setAttribute("data-theme",localStorage.getItem("libro_tema")==="dark"?"dark":"light");}catch(e){document.documentElement.setAttribute("data-theme","light");}</script>
 <div class="ptr" id="ptr" aria-hidden="true"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></i><span>Tirá para actualizar</span></div>
+<script>try{document.documentElement.setAttribute("data-theme",localStorage.getItem("libro_tema")==="dark"?"dark":"light");}catch(e){document.documentElement.setAttribute("data-theme","light");}</script>
+<div class="ptr" id="ptr" aria-hidden="true"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></i><span>Tirá para actualizar</span></div>
 <div class="wrap">
   <header class="top">
     <div>
@@ -628,15 +647,8 @@ details.tv summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:
     <div class="list" id="w-now"><div class="empty skel">Cargando reservas…</div></div>
   </section>
   <section data-cv-sec="semana">
-    <details class="wcal" id="wcal">
-      <summary><div><b>Calendario de reservas</b><span id="wcal-sum">Cargando…</span></div><i class="chev" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></i></summary>
-      <div class="wcal-body">
-        <div class="wlegend"><span><i class="dot" style="--dot:#C9B9EC"></i>Llegada</span><span><i class="dot" style="--dot:#A9D8BB"></i>Salida · limpieza</span><span><i class="dot" style="--dot:#B9D0E8"></i>Ocupado</span></div>
-        <div class="wchips" id="wchips"></div>
-        <div id="wmonths"></div>
-        <div id="wdet"></div>
-      </div>
-    </details>
+    <div class="sec-head"><h2>Próximas reservas</h2><span class="muted" id="wnext-sum"></span></div>
+    <div class="nlist" id="wnext"><div class="empty skel">Cargando…</div></div>
   </section>
   <section data-cv-sec="semana">
     <h2 style="margin-bottom:12px">Lo que quedó pendiente</h2>
@@ -718,7 +730,7 @@ details.tv summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:
     <div class="list" id="stays"><div class="empty">Las estadías aparecen acá cuando se cargan las evaluaciones.</div></div>
   </section>
 
-  <p class="foot">Semana muestra la reserva actual y el calendario hasta la última reserva aceptada (nombre de pila, huéspedes y horarios), que se actualizan todos los días desde Airbnb. Acciones es la lista de compras y de tareas que comparten con el equipo: lo que marca uno lo ve el otro al instante. Evaluaciones muestra solo lo referido a la limpieza.</p>
+  <p class="foot">Semana muestra la reserva actual y las 5 próximas reservas (nombre de pila, huéspedes y horarios), que se actualizan todos los días desde Airbnb. Acciones es la lista de compras y de tareas que comparten con el equipo: lo que marca uno lo ve el otro al instante. Evaluaciones muestra solo lo referido a la limpieza.</p>
   </div>
 </div>
 <div class="toast" id="toast" role="status" hidden></div>
@@ -1761,49 +1773,33 @@ details.tv summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:
   }
   showCv("semana");
 
-  function resCard(r, t){
+  function resCard(r, t, compact){
     var now = r.a <= t && r.b > t, pill;
     if (r.b === t) pill = '<span class="wpill mint">Sale hoy</span>';
     else if (now) pill = '<span class="wpill sky">En el depto ahora</span>';
     else pill = '<span class="wpill lav">Llega ' + rel(r.a, t) + "</span>";
     var g = r.guests ? '<span class="wpill butter">' + r.guests + (r.guests === 1 ? " huésped" : " huéspedes") + "</span>" : "";
     var nights = r.b - r.a;
-    return '<article class="wres ' + (now || r.b === t ? "now" : "next") + '"><div class="wres-top"><div><div class="wres-name">' + esc(r.first) + '</div><div class="muted" style="font-size:.88rem">' + nights + (nights === 1 ? " noche" : " noches") + '</div></div><div class="split">' + pill + g + "</div></div>" +
+    return '<article class="wres ' + (now || r.b === t ? "now" : "next") + '">' + (compact ? "" : '<div class="wres-top"><div><div class="wres-name">' + esc(r.first) + '</div><div class="muted" style="font-size:.88rem">' + nights + (nights === 1 ? " noche" : " noches") + '</div></div><div class="split">' + pill + g + "</div></div>") +
       '<div class="wio"><div><small>Ingreso</small><b>' + longd(r.a) + "</b>" + (r.inTime ? "<span>" + esc(r.inTime) + " h</span>" : '<span class="tbc">Horario a confirmar</span>') + "</div>" +
       "<div><small>Salida</small><b>" + longd(r.b) + "</b>" + (r.outTime ? "<span>" + esc(r.outTime) + " h</span>" : '<span class="tbc">Horario a confirmar</span>') + "</div></div>" +
       (function(){ var ns = notesOf(r.notes); return ns.length ? '<div class="wnotes"><small>Pedidos del huésped</small>' + ns.map(function(x){ return "<span>" + esc(x).replace(/\((a confirmar)\)/i, '<span class="tbc">($1)</span>') + "</span>"; }).join("") + "</div>" : ""; })() +
       '<div class="wclean">Limpieza: ' + longd(r.b) + (r.outTime ? ", después de las " + esc(r.outTime) : ", después de la salida") + "</div></article>";
   }
-  function renderCal(up, t){
-    if (!up.length) { $("wcal-sum").textContent = "No hay reservas aceptadas por delante."; $("wmonths").innerHTML = ""; $("wchips").innerHTML = ""; $("wdet").innerHTML = ""; return; }
-    var last = up[up.length - 1].b;
-    $("wcal-sum").textContent = "Hasta el " + longd(last) + " · " + up.length + (up.length === 1 ? " reserva" : " reservas");
-    if (W.sel !== null && !up[W.sel]) W.sel = null;
-    $("wchips").innerHTML = up.map(function(r, i){ return '<button type="button" class="wchip" data-wres="' + i + '" aria-pressed="' + (W.sel === i) + '">' + esc(r.first) + " · " + sd(r.a) + " – " + sd(r.b) + "</button>"; }).join("");
-    var d0 = new Date(t * DAY), y = d0.getUTCFullYear(), m = d0.getUTCMonth(), dl = new Date(last * DAY), ly = dl.getUTCFullYear(), lm = dl.getUTCMonth(), html = "";
-    while (y < ly || (y === ly && m <= lm)) {
-      var first = Math.round(Date.UTC(y, m, 1) / DAY), days = new Date(Date.UTC(y, m + 1, 0)).getUTCDate(), lead = (new Date(first * DAY).getUTCDay() + 6) % 7, g = "";
-      ["L","M","M","J","V","S","D"].forEach(function(w){ g += '<div class="wdh">' + w + "</div>"; });
-      for (var k = 0; k < lead; k++) g += "<div></div>";
-      for (var dd = 0; dd < days; dd++) {
-        var n = first + dd, cls = [], tag = "", ri = null, isIn = false, isOut = false;
-        up.forEach(function(r, i){
-          if (n === r.a) { isIn = true; ri = i; }
-          else if (n === r.b) { isOut = true; if (ri === null) ri = i; }
-          else if (n > r.a && n < r.b) { cls.push("occ"); ri = i; }
-        });
-        if (isIn && isOut) { cls = ["turn"]; tag = "sale/llega"; } else if (isIn) { cls = ["in"]; tag = "llega"; } else if (isOut) { cls = ["out"]; tag = "sale"; }
-        if (n < t) cls.push("past");
-        if (n === t) cls.push("today");
-        if (ri !== null && W.sel === ri) cls.push("sel");
-        g += ri !== null ? '<button type="button" class="wcd ' + cls.join(" ") + '" data-wres="' + ri + '" aria-label="' + longd(n) + ", " + esc(up[ri].first) + '">' + (dd + 1) + (tag ? "<small>" + tag + "</small>" : "") + "</button>"
-                         : '<div class="wcd ' + cls.join(" ") + '">' + (dd + 1) + "</div>";
-      }
-      html += '<div class="wmonth"><h4>' + MES[m] + " " + y + '</h4><div class="wgrid">' + g + "</div></div>";
-      m++; if (m > 11) { m = 0; y++; }
-    }
-    $("wmonths").innerHTML = html;
-    $("wdet").innerHTML = W.sel !== null ? resCard(up[W.sel], t) : '<p class="muted" style="margin:0;font-size:.9rem">Tocá una reserva o un día marcado para ver sus datos.</p>';
+  function renderNext(up, t, shown){
+    var all = up.filter(function(r){ return r.a > t && shown.indexOf(r.a) < 0; }), list = all.slice(0, 5);
+    $("wnext-sum").textContent = all.length > 5 ? "Las 5 más cercanas de " + all.length : "";
+    if (!list.length) { $("wnext").innerHTML = '<div class="empty">No hay más reservas por delante.</div>'; return; }
+    if (W.sel !== null && !list.some(function(r){ return r.a === W.sel; })) W.sel = null;
+    $("wnext").innerHTML = list.map(function(r){
+      var open = W.sel === r.a, n = r.b - r.a, d = new Date(r.a * DAY);
+      return '<div class="nitem' + (open ? " open" : "") + '"><button type="button" class="nhead" data-wres="' + r.a + '" aria-expanded="' + open + '">' +
+        '<span class="ndate"><b>' + d.getUTCDate() + '</b><small>' + MES[d.getUTCMonth()].slice(0, 3) + '</small></span>' +
+        '<span class="nmain"><b>' + esc(r.first) + '</b><span>' + longd(r.a) + ' → ' + longd(r.b) + ' · ' + n + (n === 1 ? " noche" : " noches") + '</span></span>' +
+        '<span class="nside"><span class="wpill lav">' + rel(r.a, t).replace(/^en /, "En ") + '</span>' + (r.guests ? '<span class="wpill butter">' + r.guests + (r.guests === 1 ? " huésped" : " huéspedes") + '</span>' : '') + '</span>' +
+        '<i class="chev" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></i></button>' +
+        (open ? '<div class="nbody">' + resCard(r, t, true) + '</div>' : '') + '</div>';
+    }).join("");
   }
   function future(){ var t = todayN(); return (W.up || []).filter(function(r){ return r.b >= t; }); }
   function renderSemana(){
@@ -1811,9 +1807,10 @@ details.tv summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:
     $("w-today").textContent = "Hoy " + longd(t);
     if (W.up) {
       var up = future(), cur = up.filter(function(r){ return r.a <= t; });
-      if (cur.length) { $("w-now-title").textContent = cur.length > 1 ? "Reservas de hoy" : "Reserva actual"; $("w-now").innerHTML = cur.map(function(r){ return resCard(r, t); }).join(""); }
-      else { var nx = up[0]; $("w-now-title").textContent = nx ? "Próxima llegada" : "Reserva actual"; $("w-now").innerHTML = nx ? resCard(nx, t) : '<div class="empty">No hay huéspedes ni llegadas cargadas.</div>'; }
-      renderCal(up, t);
+      var shown = [];
+      if (cur.length) { $("w-now-title").textContent = cur.length > 1 ? "Reservas de hoy" : "Reserva actual"; $("w-now").innerHTML = cur.map(function(r){ return resCard(r, t); }).join(""); shown = cur.map(function(r){ return r.a; }); }
+      else { var nx = up[0]; $("w-now-title").textContent = nx ? "Próxima llegada" : "Reserva actual"; $("w-now").innerHTML = nx ? resCard(nx, t) : '<div class="empty">No hay huéspedes ni llegadas cargadas.</div>'; if (nx) shown = [nx.a]; }
+      renderNext(up, t, shown);
     }
     var pend = (W.compras || []).filter(function(i){ return i.status !== "comprado"; });
     var td = (W.tareas || []).filter(function(i){ return i.status !== "hecha"; });
@@ -1888,7 +1885,7 @@ details.tv summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:
     var cv = e.target.closest("[data-cv]");
     if (cv) { showCv(cv.getAttribute("data-cv")); if (!cv.closest("#csub")) window.scrollTo(0, 0); return; }
     var wr = e.target.closest("[data-wres]");
-    if (wr) { var ix = Number(wr.getAttribute("data-wres")); W.sel = W.sel === ix ? null : ix; renderCal(future(), todayN()); if (W.sel !== null) $("wdet").scrollIntoView({ behavior: "smooth", block: "nearest" }); return; }
+    if (wr) { var ix = Number(wr.getAttribute("data-wres")); W.sel = W.sel === ix ? null : ix; renderSemana(); if (W.sel !== null) { var hd = document.querySelector('.nhead[data-wres="' + ix + '"]'); if (hd) hd.scrollIntoView({ behavior: "smooth", block: "nearest" }); } return; }
     var b = e.target.closest("[data-todo]");
     if (!b || !W.mcp || typeof W.mcp.callTool !== "function") return;
     var id = b.getAttribute("data-id"), act = b.getAttribute("data-todo");
