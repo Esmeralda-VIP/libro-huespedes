@@ -347,7 +347,10 @@ details.tv summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:
 .nitem.open .chev{transform:rotate(180deg)}
 .nbody{padding:0 10px 10px}
 .nbody .wres{box-shadow:none}
-@media (max-width:420px){.nhead{grid-template-columns:44px minmax(0,1fr) 28px;row-gap:6px}.ndate{grid-row:1/3}.nside{grid-column:2;grid-row:2;flex-direction:row;justify-content:flex-start}.nhead .chev{grid-column:3;grid-row:1/3}}
+@media (max-width:420px){.nhead{grid-template-columns:44px minmax(0,1fr) 28px;row-gap:6px}.ndate{grid-row:1/3}.nside{grid-column:2;grid-row:2;flex-direction:row;flex-wrap:wrap;justify-content:flex-start}.nhead .chev{grid-column:3;grid-row:1/3}}
+.lug{background:var(--tile-soft);color:var(--ink);border-radius:12px;padding:8px 12px;font-size:.9rem;display:flex;flex-direction:column;gap:3px}
+.lug small{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tile)}
+.lug .tbc{color:var(--warn);font-weight:700}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
 .gate{position:fixed;inset:0;z-index:60;background:var(--bg);overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px}
@@ -528,6 +531,8 @@ details.tv summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:
 </script>
 
 
+<script>try{document.documentElement.setAttribute("data-theme",localStorage.getItem("libro_tema")==="dark"?"dark":"light");}catch(e){document.documentElement.setAttribute("data-theme","light");}</script>
+<div class="ptr" id="ptr" aria-hidden="true"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></i><span>Tirá para actualizar</span></div>
 <script>try{document.documentElement.setAttribute("data-theme",localStorage.getItem("libro_tema")==="dark"?"dark":"light");}catch(e){document.documentElement.setAttribute("data-theme","light");}</script>
 <div class="ptr" id="ptr" aria-hidden="true"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></i><span>Tirá para actualizar</span></div>
 <script>try{document.documentElement.setAttribute("data-theme",localStorage.getItem("libro_tema")==="dark"?"dark":"light");}catch(e){document.documentElement.setAttribute("data-theme","light");}</script>
@@ -1048,7 +1053,7 @@ details.tv summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:
       var inT = mine.filter(function(r){ return r.inD === TODAY; })[0];
       var nxt = mine.filter(function(r){ return r.inD > TODAY; })[0];
       var lines = [];
-      var ph = function(r){ return (phoneOf(r) ? '<div style="font-size:.88rem">' + phoneLine(r) + '</div>' : '') + chatHTML(r); };
+      var ph = function(r){ var lg = (proxOf(r).luggage || rvOf(r).luggage); var lt = lg && (lg.drop || lg.pickup) ? '<div class="lug" style="margin-top:4px"><span><b>Valijas:</b> ' + (lg.drop ? 'las dejan ' + (lg.drop === "?" ? '(hora a confirmar)' : 'a las ' + esc(lg.drop)) : '') + (lg.drop && lg.pickup ? ' · ' : '') + (lg.pickup ? 'las retiran ' + (lg.pickup === "?" ? '(hora a confirmar)' : 'a las ' + esc(lg.pickup)) : '') + (lg.ok ? '' : ' <span class="tbc">(a confirmar)</span>') + '</span></div>' : ''; return (phoneOf(r) ? '<div style="font-size:.88rem">' + phoneLine(r) + '</div>' : '') + lt + chatHTML(r); };
       if (outT) lines.push('<div class="prop-state"><span class="tag out">Sale hoy</span>' + who(outT) + '<span class="mono muted">' + esc(outT.id) + '</span></div>' + ph(outT));
       if (inT) lines.push('<div class="prop-state"><span class="tag in">Entra hoy</span>' + who(inT) + '<span class="mono muted">' + esc(inT.id) + '</span> · ' + plural(inT.nights, "noche", "noches") + '</div>' + ph(inT));
       else if (cur) lines.push('<div class="prop-state"><span class="tag in">Ocupado</span>' + who(cur) + 'hasta el <b>' + fmt(cur.outD, { weekday: "short", day: "numeric", month: "short" }) + '</b> <span class="mono muted">' + esc(cur.id) + '</span></div>' + ph(cur));
@@ -1169,6 +1174,13 @@ details.tv summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:
       kv("Reservó", r.bookedD != null ? fmt(r.bookedD, { day: "numeric", month: "short", year: "numeric" }) : "—", lead != null && isFinite(lead) ? plural(lead, "día", "días") + " antes de llegar" : "") +
       kv("Canal", esc(r.source || "Airbnb"), '<span class="mono">' + esc(r.id) + '</span>') +
       (r.status === "cancelled" ? kv("Cancelada", r.cancelD != null ? fmt(r.cancelD, { day: "numeric", month: "short", year: "numeric" }) : "Sí") : "") + '</div>';
+    var lg = px.luggage || rv.luggage;
+    if (lg && (lg.drop || lg.pickup)) {
+      h += '<div class="lug"><small>Guardado de valijas</small>' +
+        (lg.drop ? '<span>Las dejan el <b>' + fmt(r.inD, { weekday: "short", day: "numeric", month: "short" }) + '</b>' + (lg.drop === "?" ? ', <span class="tbc">hora a confirmar</span>' : ' a las <b>' + esc(lg.drop) + ' h</b>') + ' (antes del ingreso)</span>' : '') +
+        (lg.pickup ? '<span>Las retiran el <b>' + fmt(r.outD, { weekday: "short", day: "numeric", month: "short" }) + '</b>' + (lg.pickup === "?" ? ', <span class="tbc">hora a confirmar</span>' : ' a las <b>' + esc(lg.pickup) + ' h</b>') + ' (después de la salida)</span>' : '') +
+        (lg.ok ? '' : '<span class="tbc">Pedido sin confirmar: respondelo en el chat de Airbnb</span>') + '</div>';
+    }
     var notes = String(px.notes || "").split(/\s*\|\s*/).map(function(x){ return x.trim(); }).filter(Boolean);
     if (notes.length) h += '<div class="wnotes"><small>Pedidos del huésped</small>' + notes.map(function(x){ return '<span>' + esc(x) + '</span>'; }).join("") + '</div>';
     if (r.status !== "cancelled") h += chatHTML(r);
@@ -1450,7 +1462,7 @@ details.tv summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:
     else if (a === "ficha") { S.ficha = S.ficha === id ? null : id; renderBook(); }
     else if (a === "cal-close") { S.calSel = null; S.calFree = null; renderOwnerCal(); }
   });
-  document.addEventListener("libro:prox", function(){ renderBook(); renderOwnerCal(); });
+  document.addEventListener("libro:prox", function(){ renderToday(); renderBook(); renderOwnerCal(); });
   document.addEventListener("submit", function(e){
     var f = e.target.closest("form.name-form");
     if (!f) return;
@@ -1782,17 +1794,28 @@ details.tv summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:
   }
   showCv("semana");
 
+  function lugParse(v){ var o = null; try { o = v ? (typeof v === "string" ? JSON.parse(v) : v) : null; } catch (e) { o = null; } return o && (o.drop || o.pickup) ? o : null; }
+  function lugHTML(r){
+    var l = r.luggage; if (!l) return "";
+    var h = '<div class="lug"><small>Guardado de valijas</small>';
+    if (l.drop) h += "<span>Las dejan el <b>" + longd(r.a) + "</b>" + (l.drop === "?" ? ', <span class="tbc">hora a confirmar</span>' : " a las <b>" + esc(l.drop) + " h</b>") + " (antes del ingreso)</span>";
+    if (l.pickup) h += "<span>Las retiran el <b>" + longd(r.b) + "</b>" + (l.pickup === "?" ? ', <span class="tbc">hora a confirmar</span>' : " a las <b>" + esc(l.pickup) + " h</b>") + " (después de la salida)</span>";
+    if (!l.ok) h += '<span class="tbc">Pedido sin confirmar todavía</span>';
+    return h + "</div>";
+  }
+  function lugPill(r){ var l = r.luggage; if (!l) return ""; return '<span class="wpill sky">Valijas' + (l.drop && l.drop !== "?" ? " " + esc(l.drop) : (!l.drop && l.pickup && l.pickup !== "?" ? " hasta " + esc(l.pickup) : "")) + "</span>"; }
   function resCard(r, t, compact){
     var now = r.a <= t && r.b > t, pill;
     if (r.b === t) pill = '<span class="wpill mint">Sale hoy</span>';
     else if (now) pill = '<span class="wpill sky">En el depto ahora</span>';
     else pill = '<span class="wpill lav">Llega ' + rel(r.a, t) + "</span>";
-    var g = r.guests ? '<span class="wpill butter">' + r.guests + (r.guests === 1 ? " huésped" : " huéspedes") + "</span>" : "";
+    var g = (r.guests ? '<span class="wpill butter">' + r.guests + (r.guests === 1 ? " huésped" : " huéspedes") + "</span>" : "") + lugPill(r);
     var nights = r.b - r.a;
     return '<article class="wres ' + (now || r.b === t ? "now" : "next") + '">' + (compact ? "" : '<div class="wres-top"><div><div class="wres-name">' + esc(r.first) + '</div><div class="muted" style="font-size:.88rem">' + nights + (nights === 1 ? " noche" : " noches") + '</div></div><div class="split">' + pill + g + "</div></div>") +
       '<div class="wio"><div><small>Ingreso</small><b>' + longd(r.a) + "</b>" + (r.inTime ? "<span>" + esc(r.inTime) + " h</span>" : '<span class="tbc">Horario a confirmar</span>') + "</div>" +
       "<div><small>Salida</small><b>" + longd(r.b) + "</b>" + (r.outTime ? "<span>" + esc(r.outTime) + " h</span>" : '<span class="tbc">Horario a confirmar</span>') + "</div></div>" +
       (function(){ var ns = notesOf(r.notes); return ns.length ? '<div class="wnotes"><small>Pedidos del huésped</small>' + ns.map(function(x){ return "<span>" + esc(x).replace(/\((a confirmar)\)/i, '<span class="tbc">($1)</span>') + "</span>"; }).join("") + "</div>" : ""; })() +
+      lugHTML(r) +
       '<div class="wclean">Limpieza: ' + longd(r.b) + (r.outTime ? ", después de las " + esc(r.outTime) : ", después de la salida") + "</div></article>";
   }
   function renderNext(up, t, shown){
@@ -1805,7 +1828,7 @@ details.tv summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:
       return '<div class="nitem' + (open ? " open" : "") + '"><button type="button" class="nhead" data-wres="' + r.a + '" aria-expanded="' + open + '">' +
         '<span class="ndate"><b>' + d.getUTCDate() + '</b><small>' + MES[d.getUTCMonth()].slice(0, 3) + '</small></span>' +
         '<span class="nmain"><b>' + esc(r.first) + '</b><span>' + longd(r.a) + ' → ' + longd(r.b) + ' · ' + n + (n === 1 ? " noche" : " noches") + '</span></span>' +
-        '<span class="nside"><span class="wpill lav">' + rel(r.a, t).replace(/^en /, "En ") + '</span>' + (r.guests ? '<span class="wpill butter">' + r.guests + (r.guests === 1 ? " huésped" : " huéspedes") + '</span>' : '') + '</span>' +
+        '<span class="nside"><span class="wpill lav">' + rel(r.a, t).replace(/^en /, "En ") + '</span>' + (r.guests ? '<span class="wpill butter">' + r.guests + (r.guests === 1 ? " huésped" : " huéspedes") + '</span>' : '') + lugPill(r) + '</span>' +
         '<i class="chev" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></i></button>' +
         (open ? '<div class="nbody">' + resCard(r, t, true) + '</div>' : '') + '</div>';
     }).join("");
@@ -1846,14 +1869,14 @@ details.tv summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:
       if (!mcp) { W.mcp = null; return; }
       W.mcp = mcp;
       var opt = { cache: { staleTime: 30000, gcTime: 86400000 }, refetchInterval: 60000 };
-      mcp.watchTool("Google Sheets", "get_values", { spreadsheetId: SHEET, range: "Proximas!A1:H300" }, function(ev){
+      mcp.watchTool("Google Sheets", "get_values", { spreadsheetId: SHEET, range: "Proximas!A1:I300" }, function(ev){
         if (ev.type !== "data") { if (!W.up) $("w-now").innerHTML = '<div class="empty">' + errMsg(ev) + "</div>"; return; }
         var px = {};
-        rows(ev.result && ev.result.payload).forEach(function(r){ px[String(r[0])] = { guests: r[4] ? Number(r[4]) : null, inTime: String(r[5] || "").trim(), outTime: String(r[6] || "").trim(), notes: String(r[7] || "") }; });
+        rows(ev.result && ev.result.payload).forEach(function(r){ px[String(r[0])] = { guests: r[4] ? Number(r[4]) : null, inTime: String(r[5] || "").trim(), outTime: String(r[6] || "").trim(), notes: String(r[7] || ""), luggage: lugParse(r[8]) }; });
         window.__prox = px; document.dispatchEvent(new CustomEvent("libro:prox"));
         W.up = rows(ev.result && ev.result.payload).map(function(r){
           var a = iso10(r[2]), b = iso10(r[3]);
-          return { first: String(r[1] || "Huésped"), a: dnum(a), b: dnum(b), guests: r[4] ? Number(r[4]) : null, inTime: String(r[5] || "").trim(), outTime: String(r[6] || "").trim(), notes: String(r[7] || "") };
+          return { first: String(r[1] || "Huésped"), a: dnum(a), b: dnum(b), guests: r[4] ? Number(r[4]) : null, inTime: String(r[5] || "").trim(), outTime: String(r[6] || "").trim(), notes: String(r[7] || ""), luggage: lugParse(r[8]) };
         }).filter(function(r){ return !isNaN(r.a) && !isNaN(r.b); }).sort(function(x, y){ return x.a - y.a; });
         renderSemana();
       }, opt);
